@@ -1,1 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
+@import '~bootstrap/dist/css/bootstrap.min.css';
+
+* {
+  box-sizing: border-box;
+}
+html, body {
+	height: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image:  linear-gradient(rgba(84,108,131,0.8), rgba(113,134,164,0.95)), url("./shared/img/dovista.jpg");
+}

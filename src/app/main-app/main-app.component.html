@@ -1,0 +1,53 @@
+<div class="container">
+  <div>
+    <img src="../assets/logo.png" width="280" height="65" class="Logo">
+  </div>
+  <div [ngSwitch]="alertType">
+    <!-- <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin-top: 10px;">
+      {{alertMessage}}
+    </div>
+    <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin-top: 10px;">
+      {{alertMessage}}
+    </div>
+  </div> -->
+  <div class="d-flex justify-content-center h-100">
+    <div class="card">
+      <div class="card-header">
+        <h4>Skaner</h4>
+        <div class="d-flex justify-content-end social_icon">
+          <span><i class="fas fa-power-off" (click)="logout()"></i></span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div>
+          <p>
+          <span><label>Stanowisko: </label> {{entities}}</span>
+          <span><label>Dział: </label> {{entitiesParent}}</span>
+          <span><label>Użytkownik: </label> {{userName}}</span>
+        </p>
+        </div>
+        <div>
+          <h3>
+            <table class="tableResult">
+              <tr>
+                <th>Sztuki</th>
+                <th>Wynik</th>
+              </tr>
+              <tr>
+                <td>{{scannedQty}}</td>
+                <td>{{scannedPT}}</td>
+              </tr>
+            </table>
+          </h3>
+          <div>
+            <app-demo style="z-index: -1;"></app-demo>
+          </div>
+        </div>
+        <div class="input-group form-group"></div>
+        <div class="input-group form-group"></div>
+      </div>
+      <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >Itemy</button>
+      <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">Blokady</button>
+    </div>
+  </div>
+</div>
