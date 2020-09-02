@@ -1,3 +1,5 @@
+import { LanguageService } from './../language.service';
+import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
@@ -6,8 +8,12 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   templateUrl: './login-app.component.html',
   styleUrls: ['./login-app.component.css'],
 })
+
 export class LoginAppComponent implements OnInit {
-  constructor(private serviceService: ServiceService) {}
+  constructor(
+    private serviceService: ServiceService,
+    private languageService: LanguageService
+  ) { }
 
   //Emitery// Bindowanie danych logowania
   @Output()
@@ -21,6 +27,7 @@ export class LoginAppComponent implements OnInit {
 
   //Deklaracja zmiennych
   userId: string;
+  language: number;
   entityId: string;
   entName: string;
   entParentName: string;
@@ -28,12 +35,28 @@ export class LoginAppComponent implements OnInit {
   soapOpeartion: string;
   soapParameters = '';
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
-  alertMessage:string = '';
+  alertMessage: string = '';
   barcodeValue;
   spanUserClass = 'input-group-prepend';
   spanEntClass = 'input-group-prepend';
   wynik = ''; //odpowiedź web-serwisu
   title = 'Skaner';
+
+  Header_login: string;
+  Input_worker: string;
+  Input_position: string;
+  Message1: string;
+  Message2: string;
+  Message3: string;
+  //Dictionary
+  dictionaryChangeLanguage() {
+    this.Header_login = dict.get('Header_login')[this.language];
+    this.Input_worker = dict.get('Worker')[this.language];
+    this.Input_position = dict.get('Position')[this.language];
+    this.Message1 = dict.get('Message1')[this.language];
+    this.Message2 = dict.get('Message2')[this.language];
+    this.Message3 = dict.get('Message3')[this.language];
+  }
 
   //Pobieranie nazwy obecnie aktywnego pola
   getFocusedInputName(name: string) {
@@ -63,9 +86,16 @@ export class LoginAppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    document.getElementById('userInput').focus();
 
-    //Uruchomienie serwisu - nasłuchiwanie odpowiedz zwrotnej
+    //Uruchomienie LanguageServisu
+    this.language = this.languageService.getLanguageFirstTime();
+    this.dictionaryChangeLanguage();
+    this.languageService.getLanguage().subscribe((data) => {
+      this.language = data;
+      this.dictionaryChangeLanguage();
+    });
+
+    //Uruchomienie Webserwisu - nasłuchiwanie odpowiedz zwrotnej
     this.serviceService.getResult().subscribe((data) => {
       this.wynik = data;
 
@@ -74,13 +104,13 @@ export class LoginAppComponent implements OnInit {
         case 'ValidateUser': {
           if (this.wynik == 'true') {
             this.spanUserClass = 'input-group-prepend ok';
-            this.UserNameEmit.emit(this.userId);//Wysyłanie userId do zmiennej globalnej
+            this.UserNameEmit.emit(this.userId); //Wysyłanie userId do zmiennej globalnej
             this.alertType = 1;
-            this.alertMessage = 'Uzytkownik znaleziony'
+            this.alertMessage = this.Message1;
           } else {
             this.spanUserClass = 'input-group-prepend nok';
             this.alertType = 2;
-            this.alertMessage = 'Uzytkownik nie istnieje'
+            this.alertMessage = this.Message2;
           }
           break;
         }
@@ -90,13 +120,13 @@ export class LoginAppComponent implements OnInit {
             this.entName = entityArray[0];
             this.entParentName = entityArray[1];
             this.alertMessage = entityArray[0];
-            this.EntitiesEmit.emit(this.entName);//Wysyłanie ent do zmiennej globalnej
-            this.EntitiesParentEmit.emit(this.entParentName)
+            this.EntitiesEmit.emit(this.entName); //Wysyłanie ent do zmiennej globalnej
+            this.EntitiesParentEmit.emit(this.entParentName);
             this.alertType = 1;
             this.spanEntClass = 'input-group-prepend ok';
             break;
           } else {
-            this.alertMessage = 'Nie znaleziono';
+            this.alertMessage = this.Message3;
             this.spanEntClass = 'input-group-prepend nok';
             this.alertType = 2;
             break;

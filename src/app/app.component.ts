@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LanguageService } from './language.service';
 
 @Component({
   selector: 'app-root',
@@ -7,7 +8,32 @@ import { Component, OnInit } from '@angular/core';
 })
 
 export class AppComponent implements OnInit {
-  constructor() {}
+  constructor(private languageService: LanguageService) {
+
+  }
+
+  i: number = 0
+  languageName: string = '[PL]';
+
+  changeLanguage(){
+  this.i++;
+  this.i = this.i%3;
+  this.languageService.setLanguage(this.i);
+    switch(this.i){
+      case 0:{
+        this.languageName = '[PL]';
+        break;
+      }
+      case 1:{
+        this.languageName = '[EN]';
+        break;
+      }
+      case 2:{
+        this.languageName = '[LT]';
+        break;
+      }
+    };
+  }
 
   userName: string;
   entName: string;
@@ -31,5 +57,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.languageService.setLanguage(0);
     }
 }

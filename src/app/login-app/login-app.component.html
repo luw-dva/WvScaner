@@ -5,7 +5,7 @@
   <div class="d-flex justify-content-center">
     <div class="card">
       <div class="card-header">
-        <h3>Zaloguj się</h3>
+        <h3>{{Header_login}}</h3>
         <div class="d-flex justify-content-end social_icon">
           <span><i class="fas fa-camera-retro"></i></span>
         </div>
@@ -15,14 +15,14 @@
           <div [ngClass]="spanUserClass">
             <span class="input-group-text" autofocus><i class="fas fa-user"></i></span>
           </div>
-          <input type="text" class="form-control" id='userInput' placeholder="Użytkownik" [(ngModel)]="userId"
+          <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId"
             (blur)="saveU($event)" (focus)="getFocusedInputName('userInput')">
         </div>
         <div class="input-group form-group">
           <div [ngClass]="spanEntClass">
             <span class="input-group-text"><i class="fas fa-industry"></i></span>
           </div>
-          <input type="text" class="form-control" id='entInput' placeholder="Obszar" [(ngModel)]="entityId"
+          <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId"
             (blur)="saveE($event)" (focus)="getFocusedInputName('entInput')">
         </div>
       </div>

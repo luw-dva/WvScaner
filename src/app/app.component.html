@@ -1,4 +1,7 @@
-<div *ngIf = 'isLoginSucces; then skanerPanel; else loginPanel'></div>
+<div class="language">
+ <span class="language_icon" (click)="changeLanguage()">{{languageName}}</span>
+</div>
+<div *ngIf = 'isLoginSucces; then skanerPanel; else loginPanel' style="position: relative;"></div>
 <ng-template #loginPanel>
   <app-login-app (isLogin)='isLogin($event)' (EntitiesEmit)='getEntName($event)' (UserNameEmit)='getUserName($event)' (EntitiesParentEmit)='getParentName($event)'></app-login-app>
 </ng-template>

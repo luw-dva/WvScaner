@@ -21,17 +21,17 @@
       <div class="card-body">
         <div>
           <p>
-          <span><label>Stanowisko: </label> {{entities}}</span>
-          <span><label>Dział: </label> {{entitiesParent}}</span>
-          <span><label>Użytkownik: </label> {{userName}}</span>
+          <span><label>{{txtPosition}}: </label> {{entities}}</span>
+          <span><label>{{txtWorkcenter}}: </label> {{entitiesParent}}</span>
+          <span><label>{{txtWorker}}: </label> {{userName}}</span>
         </p>
         </div>
         <div>
           <h3>
             <table class="tableResult">
               <tr>
-                <th>Sztuki</th>
-                <th>Wynik</th>
+                <th>{{txtQty}}</th>
+                <th>{{txtResult}}</th>
               </tr>
               <tr>
                 <td>{{scannedQty}}</td>
@@ -46,8 +46,8 @@
         <div class="input-group form-group"></div>
         <div class="input-group form-group"></div>
       </div>
-      <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >Itemy</button>
-      <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">Blokady</button>
+      <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
+      <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">{{txtBlocks}}</button>
     </div>
   </div>
 </div>

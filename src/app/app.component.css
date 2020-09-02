@@ -1,0 +1,11 @@
+.language {
+  /* or absolute, as appropriate */
+  position: relative;
+
+}
+.language_icon{
+  position: absolute;
+  right: 0px;
+  font-size: 30px;
+  color: #FFC312;
+  }

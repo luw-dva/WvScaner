@@ -1,3 +1,5 @@
+import { LanguageService } from './../language.service';
+import { dict } from './../dictionary';
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { ServiceService } from '../service.service';
 
@@ -8,7 +10,10 @@ import { ServiceService } from '../service.service';
 })
 export class MainAppComponent implements OnInit {
 
-  constructor(private serviceService: ServiceService) {}
+  constructor(
+    private serviceService: ServiceService,
+    private languageService: LanguageService
+    ) {}
 
   //Emitery// Bindowanie danych logowania
   @Output()
@@ -29,14 +34,41 @@ export class MainAppComponent implements OnInit {
   locksButtonClass: string = 'btn btn-warning';
   isItemActive:boolean = false;
   isLocksActive:boolean = false;
+  language: number;
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
   alertMessage:string = '';
   wynik:string; // Odpowiedź webservice'u
+
+  txtWorker: string;
+  txtPosition: string;
+  txtQty: string;
+  txtResult: string
+  txtItems: string
+  txtBlocks: string
+  txtWorkcenter:string;
 
   ngOnInit(): void {
     this.serviceService.getResult().subscribe((data) => {
       this.wynik = data;
     });
+
+    this.language = this.languageService.getLanguageFirstTime();
+    this.dictionaryChangeLanguage();
+    this.languageService.getLanguage().subscribe((data) => {
+      this.language = data;
+      this.dictionaryChangeLanguage();
+    });
+
+  }
+
+  dictionaryChangeLanguage() {
+    this.txtWorker = dict.get('Worker')[this.language];
+    this.txtWorkcenter = dict.get('Workcenter')[this.language];
+    this.txtPosition = dict.get('Position')[this.language];
+    this.txtQty = dict.get('Qty')[this.language];
+    this.txtResult = dict.get('Result')[this.language];
+    this.txtItems = dict.get('Items')[this.language];
+    this.txtBlocks = dict.get('Blocks')[this.language];
   }
 
   //Skaner - gdy odczyta kod kreskowy zapisuje do zmiennej

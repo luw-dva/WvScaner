@@ -1,7 +1,6 @@
-import xml2js from 'xml2js';
 import { Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { HttpParams, HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 
 
 @Injectable()
@@ -36,19 +35,18 @@ export class ServiceService {
       if (xmlhttp.readyState == 4) {
         if (xmlhttp.status == 200) {
           const xml = xmlhttp.responseXML;
-
+          console.log(xml);
           if (xml.getElementsByTagName(operation + 'Result')[0].childNodes[0].nodeName != 'Reply'){
             this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0].childNodes[0].nodeValue;
           }else{
             const num_results = xml.getElementsByTagName('Reply')[0].childNodes.length;
-
             for (let i = 0; i < num_results; i++){
-            let Parameters_name =  xml.getElementsByTagName('Reply')[0].childNodes[i].nodeName;
-            let Parameters_value = '###';
-            if (xml.getElementsByTagName('Reply')[0].childNodes[i].lastChild != null){
-               Parameters_value =  xml.getElementsByTagName('Reply')[0].childNodes[i].childNodes[0].nodeValue;
-            }
-            this.responseSOAP = this.responseSOAP + ' ' + Parameters_name + ' : ' + Parameters_value + ' |';
+              let Parameters_name =  xml.getElementsByTagName('Reply')[0].childNodes[i].nodeName;
+              let Parameters_value = '###';
+              if (xml.getElementsByTagName('Reply')[0].childNodes[i].lastChild != null){
+                Parameters_value =  xml.getElementsByTagName('Reply')[0].childNodes[i].childNodes[0].nodeValue;
+              }
+              this.responseSOAP = this.responseSOAP + ' ' + Parameters_name + ' : ' + Parameters_value + ' |';
             }
           }
           } else if (xmlhttp.status == 500)
