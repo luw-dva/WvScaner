@@ -3,9 +3,9 @@
 </div>
 <div *ngIf = 'isLoginSucces; then skanerPanel; else loginPanel' style="position: relative;"></div>
 <ng-template #loginPanel>
-  <app-login-app (isLogin)='isLogin($event)' (EntitiesEmit)='getEntName($event)' (UserNameEmit)='getUserName($event)' (EntitiesParentEmit)='getParentName($event)'></app-login-app>
+  <app-login-app (isLogin)='isLogin($event)'></app-login-app>
 </ng-template>
 <ng-template #skanerPanel>
-  <app-main-app (isLogin)='isLogin($event)' [entities]='entName' [userName]='userName' [entitiesParent]='entParentName'></app-main-app>
+  <app-main-app (isLogin)='isLogin($event)'></app-main-app>
 </ng-template>
 

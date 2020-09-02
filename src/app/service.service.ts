@@ -35,7 +35,7 @@ export class ServiceService {
       if (xmlhttp.readyState == 4) {
         if (xmlhttp.status == 200) {
           const xml = xmlhttp.responseXML;
-          console.log(xml);
+
           if (xml.getElementsByTagName(operation + 'Result')[0].childNodes[0].nodeName != 'Reply'){
             this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0].childNodes[0].nodeValue;
           }else{
@@ -51,6 +51,7 @@ export class ServiceService {
           }
           } else if (xmlhttp.status == 500)
             {this.responseSOAP = 'Response is false'}
+            console.log(this.responseSOAP);
             this.result.next(this.responseSOAP);
       }
     };

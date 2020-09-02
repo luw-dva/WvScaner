@@ -1,4 +1,4 @@
-import { LanguageService } from './../language.service';
+import { DataService } from './../data.service';
 import { dict } from './../dictionary';
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { ServiceService } from '../service.service';
@@ -12,17 +12,15 @@ export class MainAppComponent implements OnInit {
 
   constructor(
     private serviceService: ServiceService,
-    private languageService: LanguageService
+    private dataService: DataService
     ) {}
 
   //Emitery// Bindowanie danych logowania
   @Output()
   isLogin = new EventEmitter<boolean>();
-  @Input()
+
   userName:string;
-  @Input()
   entities:string;
-  @Input()
   entitiesParent:string;
 
   //Deklaracja zmiennych
@@ -52,13 +50,16 @@ export class MainAppComponent implements OnInit {
       this.wynik = data;
     });
 
-    this.language = this.languageService.getLanguageFirstTime();
+    this.language = this.dataService.getLanguageFirstTime();
     this.dictionaryChangeLanguage();
-    this.languageService.getLanguage().subscribe((data) => {
+    this.dataService.getLanguage().subscribe((data) => {
       this.language = data;
       this.dictionaryChangeLanguage();
     });
 
+    this.userName = this.dataService.getUserName();
+    this.entities = this.dataService.getEntName();
+    this.entitiesParent = this.dataService.getEntParentEntName();
   }
 
   dictionaryChangeLanguage() {

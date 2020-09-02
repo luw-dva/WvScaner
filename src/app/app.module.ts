@@ -1,4 +1,4 @@
-import { LanguageService } from './language.service';
+import { DataService } from './data.service';
 import { ServiceService } from './service.service';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
@@ -13,7 +13,7 @@ import { MainAppComponent } from './main-app/main-app.component';
 @NgModule({
   declarations: [AppComponent, DemoComponent, LoginAppComponent, MainAppComponent],
   imports: [BrowserModule, HttpClientModule, FormsModule, NgbModule, BarecodeScannerLivestreamModule],
-  providers: [ServiceService, LanguageService],
+  providers: [ServiceService, DataService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
