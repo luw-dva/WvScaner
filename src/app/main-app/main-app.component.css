@@ -1,5 +1,5 @@
 .container {
-  height: 80%;
+  height: 85%;
   align-content: center;
 }
 
@@ -17,7 +17,7 @@
 
 .card {
   margin-top: 10px;
-  width: 500px;
+  width: 520px;
   background-color: rgba(0, 0, 0, 0.5) !important;
 }
 

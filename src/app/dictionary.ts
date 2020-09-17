@@ -10,3 +10,5 @@ dict.set("Workcenter", ["Dział", "Workcenter", "Darbo centras"]);
 dict.set("Message1", ["Użytkownik znaleziony", "User has been found", "Vartotojas rastas"]);
 dict.set("Message2", ["Użytkownik nie isteniej", "User doesn't exist", "Vartotojas nerastas"]);
 dict.set("Message3", ["Nie znaleziono", "Not found", "Nerasta"]);
+dict.set("StaticLocation", ["Ustaw stałą lokację", "Set static location", "Nuolatinė vieta"]);
+dict.set("Scanner", ["Skaner", "Scanner", "Skaitytuvas"]);

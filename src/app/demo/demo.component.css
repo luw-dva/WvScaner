@@ -1,0 +1,9 @@
+.social_icon span{
+  font-size: 55px;
+  color: #FFC312;
+  }
+
+  .social_icon span:hover{
+  color: white;
+  cursor: pointer;
+  }

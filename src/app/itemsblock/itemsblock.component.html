@@ -1,0 +1,9 @@
+<div class='itemlist'>
+  <div>
+    <button class='btn btn-warning' (click)="close()" >close</button>
+  </div>
+
+  <div *ngFor="let item of childBLock" >
+      <p>{{item.item}} | {{item.message}}</p>
+  </div>
+</div>

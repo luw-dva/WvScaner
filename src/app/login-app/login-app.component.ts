@@ -25,15 +25,22 @@ export class LoginAppComponent implements OnInit {
   entityId: string;
   entName: string;
   entParentName: string;
+  entHasChildren: boolean = true;
+  Can_confirm_single_orders:string;
+  Ask_for_steps:string;
+  Store_products_attr:string;
+  Can_type_location:string;
+  Allow_static_location: string;
   focusedInputName: string = 'userInput';
   soapOpeartion: string;
   soapParameters = '';
+  islogin: boolean = false;
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
   alertMessage: string = '';
   barcodeValue;
   spanUserClass = 'input-group-prepend';
   spanEntClass = 'input-group-prepend';
-  wynik = ''; //odpowiedź web-serwisu
+  wynik: any; //odpowiedź web-serwisu
   title = 'Skaner';
 
   Header_login: string;
@@ -57,6 +64,7 @@ export class LoginAppComponent implements OnInit {
   getFocusedInputName(name: string) {
     this.focusedInputName = name;
   }
+
   //Operacje do wykonania po zlokalizowaniu kodu kreskowego
   //Skaner kodów kreskowych - biblioteka Quagga - https://serratus.github.io/quaggaJS/
   barcodeEvent(status: string): void {
@@ -64,7 +72,6 @@ export class LoginAppComponent implements OnInit {
     (<HTMLInputElement>(
       document.getElementById(this.focusedInputName)
     )).value = status;
-
     //Wywołanie odpowiedniego webservisu
     switch (this.focusedInputName) {
       case 'userInput': {
@@ -84,6 +91,7 @@ export class LoginAppComponent implements OnInit {
 
     //Uruchomienie LanguageServisu
     this.language = this.dataService.getLanguageFirstTime();
+
     this.dictionaryChangeLanguage();
     this.dataService.getLanguage().subscribe((data) => {
       this.language = data;
@@ -92,12 +100,14 @@ export class LoginAppComponent implements OnInit {
 
     //Uruchomienie Webserwisu - nasłuchiwanie odpowiedz zwrotnej
     this.serviceService.getResult().subscribe((data) => {
+      if (!this.islogin){
       this.wynik = data;
+
 
       //Gdy odpowiedź nadejdzie w zależności od operacji i jej wyniku dokonaj formatowania
       switch (this.soapOpeartion) {
         case 'ValidateUser': {
-          if (this.wynik == 'true') {
+          if (this.wynik.childNodes[0].nodeValue === 'true') {
             this.spanUserClass = 'input-group-prepend ok';
             this.dataService.setUserName(this.userId); //Wysyłanie userId do zmiennej globalnej
             this.alertType = 1;
@@ -110,32 +120,71 @@ export class LoginAppComponent implements OnInit {
           break;
         }
         case 'GetEntAndParentNameById': {
-          const entityArray: Array<string> = this.wynik.split('|');
-          if (entityArray[0].substring(1, 12) === 'Entity_name') {
-            this.entName = entityArray[0];
-            this.entParentName = entityArray[1];
-            this.dataService.setEntName(this.entName.substring(this.entName.indexOf(':')+2));
-            this.dataService.setEntParentEntName(this.entParentName.substring(this.entParentName.indexOf(':')+2));
-            this.alertType = 1;
-            this.alertMessage = this.entName;
-            this.spanEntClass = 'input-group-prepend ok';
-            break;
+          if (this.wynik.childNodes[0].nodeValue != 'false') {
+            try{
+              this.entName =this.wynik.getElementsByTagName('Entity_name')[0].childNodes[0].nodeValue;
+              this.dataService.setEntName(this.entName);
+              this.dataService.setEntId(this.entityId);
+            }catch(err){};
+
+            try{
+              this.entParentName =  this.wynik.getElementsByTagName('Parent_entity_name')[0].childNodes[0].nodeValue;
+              this.dataService.setEntParentName(this.entParentName);
+            }catch(err){};
+
+            try{
+              this.Can_confirm_single_orders =  this.wynik.getElementsByTagName('Can_confirm_single_orders')[0].childNodes[0].nodeValue;
+              this.dataService.setCanConfirmSingleOrders(this.Can_confirm_single_orders);
+            }catch(err){};
+
+            try{
+              this.Ask_for_steps =  this.wynik.getElementsByTagName('Ask_for_steps')[0].childNodes[0].nodeValue;
+              this.dataService.setAskForSteps(this.Ask_for_steps);
+            }catch(err){};
+
+            try{
+              this.Store_products_attr =  this.wynik.getElementsByTagName('Store_products_attr')[0].childNodes[0].nodeValue;
+              this.dataService.setStoreProductsAttr(this.Store_products_attr);
+            }catch(err){};
+
+            try{
+              this.Can_type_location =  this.wynik.getElementsByTagName('Can_type_location')[0].childNodes[0].nodeValue;
+              this.dataService.setCanTypeLocation(this.Can_type_location);
+            }catch(err){};
+
+            try{
+              this.Allow_static_location =  this.wynik.getElementsByTagName('Allow_static_location')[0].childNodes[0].nodeValue;
+              this.dataService.setAllowStaticLocation(this.Allow_static_location);
+            }catch(err){};
+
+              this.alertType = 1;
+              this.alertMessage = this.entName;
+              this.spanEntClass = 'input-group-prepend ok';
+              this.getChildren();
+              break;
           } else {
-            this.alertType = 2;
-            this.alertMessage = this.Message3;
-            this.spanEntClass = 'input-group-prepend nok';
-            break;
+              this.alertType = 2;
+              this.alertMessage = this.Message3;
+              this.spanEntClass = 'input-group-prepend nok';
+              break;
           }
+        }
+        case 'GetChildEntities': {
+         this.entHasChildren = this.wynik.childNodes[1].hasChildNodes();
+
         }
       }
 
       //Jeśli oba pola logowania są poprawne zaloguj użytkownika - przełączenie komponentów w app.component
       if (
+        !this.entHasChildren &&
         this.spanEntClass == 'input-group-prepend ok' &&
         this.spanUserClass == 'input-group-prepend ok'
       ) {
+        this.islogin = true;
         this.isLogin.emit(true);
       }
+    }
     });
   }
 
@@ -152,11 +201,9 @@ export class LoginAppComponent implements OnInit {
     this.serviceService.soapCall(this.soapOpeartion, soapParameters);
   }
 
-  saveU(event) {
-    this.getUsers();
-  }
-
-  saveE(event) {
-    this.getEntity();
+  getChildren(): any {
+    this.soapOpeartion = `GetChildEntities`;
+    const soapParameters = `<entId>` + this.entityId + `</entId>`;
+    this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
   }
 }

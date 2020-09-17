@@ -8,32 +8,43 @@ import { BarecodeScannerLivestreamComponent } from 'ngx-barcode-scanner';
 })
 export class DemoComponent implements AfterViewInit {
 
-  constructor(){
+  constructor(){}
 
-  }
  @ViewChild(BarecodeScannerLivestreamComponent)
     barecodeScanner: BarecodeScannerLivestreamComponent;
 
     @Output()
     barCodeResult = new EventEmitter<string>();
 
-    barcodeValue;
+    barcodeValue: string;
+    isCamActive: boolean = false;
+    isCamIconHidden: boolean = true;
 
     ngAfterViewInit() {
       this.barecodeScanner.start();
     }
 
     onValueChanges(result){
+      if(
+        this.barcodeValue != result.codeResult.code){
         this.barcodeValue = result.codeResult.code ;
         this.barCodeResult.emit(this.barcodeValue);
-        setTimeout(()=>{                           //<<<---using ()=> syntax
-
-        }, 100);
-
-
+        this.isCamActive = false;
+        this.isCamIconHidden = true;
+      }
     }
 
-    onStarted(started: any){
-      console.log(started);
+    onStarted(){
+    }
+
+    changeCamActive(){
+      this.isCamActive = !this.isCamActive;
+      this.isCamIconHidden = !this.isCamIconHidden;
+      this.barcodeValue = '';
+      // if(this.isCamActive){
+      //   this.barecodeScanner.stop();
+      // }else{
+      //   this.barecodeScanner.stop();
+      // }
     }
 }

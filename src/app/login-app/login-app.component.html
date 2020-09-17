@@ -7,7 +7,7 @@
       <div class="card-header">
         <h3>{{Header_login}}</h3>
         <div class="d-flex justify-content-end social_icon">
-          <span><i class="fas fa-camera-retro"></i></span>
+          <span><i class="fas fa-qrcode"></i></span>
         </div>
       </div>
       <div class="card-body">
@@ -16,14 +16,14 @@
             <span class="input-group-text" autofocus><i class="fas fa-user"></i></span>
           </div>
           <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId"
-            (blur)="saveU($event)" (focus)="getFocusedInputName('userInput')">
+            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')">
         </div>
         <div class="input-group form-group">
           <div [ngClass]="spanEntClass">
             <span class="input-group-text"><i class="fas fa-industry"></i></span>
           </div>
           <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId"
-            (blur)="saveE($event)" (focus)="getFocusedInputName('entInput')">
+            (blur)=" getEntity()" (focus)="getFocusedInputName('entInput')">
         </div>
       </div>
     </div>
