@@ -17,8 +17,6 @@ export class ServiceService {
   private responseSOAP: any;
   private result = new Subject<string>();
 
-
-
   soapCall(operation: string, parameters: string): void {
     this.soapStructure(operation, parameters, this.WSDL);
   }
@@ -56,17 +54,19 @@ export class ServiceService {
       </soap12:Envelope>`;
 
       xmlhttp.onreadystatechange = () => {
+
         if (xmlhttp.readyState == 4) {
           if (xmlhttp.status == 200) {
             const xml = xmlhttp.responseXML;
-
+              console.log(xml);
               this.responseSOAP = this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0];
 
           } else if (xmlhttp.status == 500) {
             this.responseSOAP = 'false';
           }
-          console.log(this.responseSOAP);
+
           this.result.next(this.responseSOAP);
+          this.responseSOAP = '';
         }
       };
     // Send the POST request.

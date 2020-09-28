@@ -13,6 +13,7 @@ export class DataService {
   private language:number = 0;
   private userName:string;
   private entName:string;
+  private blocks: Array<{ item: string; message: string; pos: string}>;
   private entId:string;
   private entParentName: string;
   private Can_confirm_single_orders:string;
@@ -28,6 +29,14 @@ export class DataService {
 
   getLanguage(): Observable<number> {
     return this.lang.asObservable();
+  }
+
+  setBlocks(block: Array<{ item: string; message: string; pos: string}>){
+    this.blocks = block;
+}
+
+  getBlocks(): Array<{ item: string; message: string; pos: string}> {
+      return this.blocks;
   }
 
   getLanguageFirstTime(): number {

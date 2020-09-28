@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
   i: number = 0;
 
   languageName: string = '[PL]';
-  isLoginSucces: boolean = false;
+  viewNumber: number = 1;
 
   ngOnInit(): void {
     this.dataService.setLanguage(0);
@@ -39,7 +39,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  isLogin(status: boolean): void {
-    this.isLoginSucces = status;
+  isLogin(status: number): void {
+    this.viewNumber = status;
   }
 }

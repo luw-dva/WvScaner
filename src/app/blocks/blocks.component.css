@@ -1,0 +1,154 @@
+
+.container{
+  height: 95%;
+  align-content: center;
+  }
+
+  .card{
+  height: 420px;
+  margin-top: 10px;
+  width: 500px;
+  background-color: rgba(0,0,0,0.5) !important;
+  }
+
+  .blocklist{
+    margin-bottom: 10px;
+
+    border-radius: 5px;
+    border: 2px solid #ffc312;
+    color: whitesmoke;
+    text-align: center;
+  }
+
+  .social_icon span{
+  font-size: 55px;
+  margin-left: 10px;
+  color: #FFC312;
+  }
+
+  .social_icon span:hover{
+  color: white;
+  cursor: pointer;
+  }
+
+  .card-header h3,
+  .card-header h4 {
+    color: white;
+  }
+
+  .social_icon{
+  position: absolute;
+  right: 20px;
+  top: -60px;
+  }
+
+  .input-group-prepend span{
+  width: 50px;
+  background-color: rgb(3, 71, 131);;
+  color: white;
+  border:0 !important;
+  }
+
+  .card-header{
+    margin:0px;
+    padding-top: 5px;
+  }
+  .input-group-prepend.ok span{
+    width: 50px;
+    background-color: rgb(18, 131, 3);;
+    color: white;
+    border:0 !important;
+    }
+
+
+  .input-group-prepend.nok span{
+  width: 50px;
+  background-color: rgb(131, 3, 3);;
+  color: white;
+  border:0 !important;
+  }
+
+  input:focus{
+  outline: 0 0 0 0  !important;
+  box-shadow: 0 0 0 0 !important;
+
+  }
+
+  .remember{
+  color: white;
+  }
+
+  .remember input
+  {
+  width: 20px;
+  height: 20px;
+  margin-left: 15px;
+  margin-right: 5px;
+  }
+
+  .login_btn{
+  color: white;
+  background-color: rgb(3, 71, 131);
+  width: 100px;
+  }
+
+  .login_btn:hover{
+  color: black;
+  background-color: white;
+  }
+
+  .links{
+  color: white;
+  }
+
+  .links a{
+  margin-left: 4px;
+  }
+
+
+.Logo{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+.camera{
+  margin-top: 10px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#intro {
+  position: obsolute; /* or absolute, as appropriate */
+  bottom: 0px;
+}
+#down_arrow {
+  position: absolute;
+  bottom: 0px;
+}
+
+#password-3{
+  -webkit-text-security: disc;
+    -moz-text-security:circle;
+     text-security:circle;
+
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+#outer
+{
+    width:100%;
+    text-align: center;
+}
+.inner
+{
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+

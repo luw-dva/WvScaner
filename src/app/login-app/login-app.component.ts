@@ -17,7 +17,7 @@ export class LoginAppComponent implements OnInit {
 
   //Emitery// Bindowanie danych logowania
   @Output()
-  isLogin = new EventEmitter<boolean>();
+  isLogin = new EventEmitter<number>();
 
   //Deklaracja zmiennych
   userId: string;
@@ -119,8 +119,9 @@ export class LoginAppComponent implements OnInit {
           }
           break;
         }
+
         case 'GetEntAndParentNameById': {
-          if (this.wynik.childNodes[0].nodeValue != 'false') {
+          if (this.wynik != 'false') {
             try{
               this.entName =this.wynik.getElementsByTagName('Entity_name')[0].childNodes[0].nodeValue;
               this.dataService.setEntName(this.entName);
@@ -161,6 +162,7 @@ export class LoginAppComponent implements OnInit {
               this.alertMessage = this.entName;
               this.spanEntClass = 'input-group-prepend ok';
               this.getChildren();
+
               break;
           } else {
               this.alertType = 2;
@@ -181,8 +183,8 @@ export class LoginAppComponent implements OnInit {
         this.spanEntClass == 'input-group-prepend ok' &&
         this.spanUserClass == 'input-group-prepend ok'
       ) {
-        this.islogin = true;
-        this.isLogin.emit(true);
+
+        this.isLogin.emit(2);
       }
     }
     });

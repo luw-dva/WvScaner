@@ -16,7 +16,7 @@ export class MainAppComponent implements OnInit {
 
   //Emitery// Bindowanie danych logowania
   @Output()
-  isLogin = new EventEmitter<boolean>();
+  isLogin = new EventEmitter<number>();
 
   userName: string;
   entities: string;
@@ -33,6 +33,7 @@ export class MainAppComponent implements OnInit {
   isItemActive: boolean = false;
   isLocksActive: boolean = false;
   isSpecialItem: boolean = false;
+  isBlocks: boolean = false;
   isStaticLocation: boolean = false;
   language: number;
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
@@ -48,7 +49,11 @@ export class MainAppComponent implements OnInit {
   txtBlocks: string;
   txtWorkcenter: string;
   txtLocation: string;
-  itemsBlockResult: Array<{ item: string; message: string }> = [];
+  itemsResult: Array<{ item: string; message: string }> = [];
+  blockResult: Array<{ item: string; message: string; pos: string}> = [];
+
+  parser = new DOMParser();
+
 
   ngOnInit(): void {
     this.serviceService.getResult().subscribe((data: any) => {
@@ -58,7 +63,7 @@ export class MainAppComponent implements OnInit {
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
           for (
             let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
-            this.itemsBlockResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
+            this.itemsResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
               message: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('message')[0].childNodes[0].nodeValue,
             };
           }
@@ -66,9 +71,24 @@ export class MainAppComponent implements OnInit {
         }
       }
 
+      if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
+
+        let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
+        if (xmlDoc.getElementsByTagName('Locks').length) {
+          for (
+            let i = 0; i < xmlDoc.getElementsByTagName('Locks').length; i++) {
+            this.blockResult[i] = {item: xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('Notes')[0].childNodes[0].nodeValue,
+              message: xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('LockDescription')[0].childNodes[0].nodeValue,
+              pos: this.wynik.getElementsByTagName('BundlePosition')[0].childNodes[0].nodeValue,
+            };
+          }
+          this.isBlocks = true;
+          this.dataService.setBlocks(this.blockResult);
+        }
+        this.isLogin.emit(3);
+      }
+
     });
-
-
 
     this.language = this.dataService.getLanguageFirstTime();
     this.dictionaryChangeLanguage();
@@ -106,6 +126,7 @@ export class MainAppComponent implements OnInit {
 
     if (this.isLocksActive) {
       this.getActiveLocksByWoOperation();
+
     }
   }
 
@@ -132,11 +153,10 @@ export class MainAppComponent implements OnInit {
       this.dataService.getEntParentName() +
       `</operation>`;
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
-
   }
 
   logout(): void {
-    this.isLogin.emit(false);
+    this.isLogin.emit(1);
   }
 
   activeItem() {
@@ -152,6 +172,7 @@ export class MainAppComponent implements OnInit {
     }
   }
   activeLocks() {
+
     this.isLocksActive = !this.isLocksActive;
     this.isItemActive = false;
 
@@ -162,10 +183,11 @@ export class MainAppComponent implements OnInit {
       this.locksButtonClass = 'btn btn-warning';
       this.itemButtonClass = 'btn btn-warning';
     }
+
   }
 
   closeSpecialItemWindow(res: boolean) {
     this.isSpecialItem = !res;
-    this.itemsBlockResult.length = 0;
+    this.itemsResult.length = 0;
   }
 }
