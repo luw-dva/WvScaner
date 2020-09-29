@@ -36,6 +36,7 @@ export class ServiceService {
   soapStructure(operation: string, parameters: string, WSDL: string){
     this.responseSOAP = '';
     const xmlhttp = new XMLHttpRequest();
+
     xmlhttp.open('POST', WSDL, true);
 
     const sr =

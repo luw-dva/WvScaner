@@ -15,21 +15,21 @@
                 <span><b>{{item.item}}</b></span></p>
             </div>
             <div id="outer">
-              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;" ><i class="fas fa-arrow-circle-left"></i></button></div>
-              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;"><i class="fas fa-arrow-circle-right"></i></button></div>
+              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;" ><fa-icon [icon]="faArrowAltCircleLeft"></fa-icon></button></div>
+              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;"><fa-icon [icon]="faArrowAltCircleRight"></fa-icon></button></div>
             </div>
         </div>
 
         <div class="input-group form-group">
           <div class='input-group-prepend'>
-            <span class="input-group-text"><i class="fas fa-user-lock"></i></span>
+            <span class="input-group-text"><fa-icon [icon]="faUserLock"></fa-icon></span>
           </div>
             <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityNumber' [(ngModel)]="qualityNumer" placeholder={{qualityWorkerNumber}}>
           </div>
         </div>
       <div class="input-group form-group">
         <div class='input-group-prepend'>
-          <span class="input-group-text"><i class="fas fa-key"></i></span>
+          <span class="input-group-text"><fa-icon [icon]="faKey"></fa-icon></span>
         </div>
           <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityPIN' [(ngModel)]="qualityPIN" placeholder='PIN' type="number" pattern="[0-9][0-9][0-9][0-9]" inputmode="numeric">
         </div>

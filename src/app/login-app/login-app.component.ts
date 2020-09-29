@@ -2,6 +2,7 @@ import { DataService } from './../data.service';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { faIndustry, faUser, faQrcode } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-login-app',
@@ -14,6 +15,11 @@ export class LoginAppComponent implements OnInit {
     private serviceService: ServiceService,
     private dataService: DataService
   ) { }
+
+  //Icons
+  faIndustry = faIndustry;
+  faUser = faUser;
+  faQrcode = faQrcode;
 
   //Emitery// Bindowanie danych logowania
   @Output()
@@ -77,6 +83,7 @@ export class LoginAppComponent implements OnInit {
       case 'userInput': {
         this.userId = status;
         this.getUsers();
+        this.focusedInputName = 'entInput';
         break;
       }
       case 'entInput': {

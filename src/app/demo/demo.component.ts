@@ -1,5 +1,6 @@
 import { Component, ViewChild, AfterViewInit, Output, EventEmitter } from '@angular/core';
 import { BarecodeScannerLivestreamComponent } from 'ngx-barcode-scanner';
+import {faCamera } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-demo',
@@ -12,6 +13,8 @@ export class DemoComponent implements AfterViewInit {
 
  @ViewChild(BarecodeScannerLivestreamComponent)
     barecodeScanner: BarecodeScannerLivestreamComponent;
+
+    faCamera= faCamera;
 
     @Output()
     barCodeResult = new EventEmitter<string>();

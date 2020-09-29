@@ -2,6 +2,7 @@ import { DataService } from './../data.service';
 import { dict } from './../dictionary';
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { ServiceService } from '../service.service';
+import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-main-app',
@@ -13,6 +14,9 @@ export class MainAppComponent implements OnInit {
     private serviceService: ServiceService,
     private dataService: DataService
   ) {}
+
+  //Icons
+  faPowerOff = faPowerOff;
 
   //Emitery// Bindowanie danych logowania
   @Output()

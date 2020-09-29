@@ -1,0 +1,8 @@
+{
+  "/api": {
+      "target": "'http://dkvdc-wmes0001/MESServices/MESConfirmOperation.asmx?WSDL'",
+      "secure": false,
+      "logLevel": "debug",
+      "changeOrigin": true
+  }
+}

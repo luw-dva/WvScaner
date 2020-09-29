@@ -2,6 +2,7 @@ import { DataService } from './../data.service';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
+import { faUserLock, faKey, faArrowAltCircleLeft, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-blocks',
@@ -14,6 +15,11 @@ export class BlocksComponent implements OnInit {
 
   constructor(private serviceService: ServiceService,
     private dataService: DataService) { }
+
+  faUserLock = faUserLock;
+  faKey = faKey;
+  faArrowAltCircleLeft = faArrowAltCircleLeft;
+  faArrowAltCircleRight = faArrowAltCircleRight;
 
   qualityNumer: string;
   qualityPIN: string;
