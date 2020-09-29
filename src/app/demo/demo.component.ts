@@ -22,7 +22,9 @@ export class DemoComponent implements AfterViewInit {
 
     ngAfterViewInit() {
       this.barecodeScanner.start();
+
     }
+
 
     onValueChanges(result){
       if(
@@ -34,8 +36,11 @@ export class DemoComponent implements AfterViewInit {
       }
     }
 
-    onStarted(){
+    onStarted(started){
+      console.log(started);
     }
+
+
 
     changeCamActive(){
       this.isCamActive = !this.isCamActive;

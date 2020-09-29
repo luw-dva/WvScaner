@@ -18,6 +18,7 @@ export class BlocksComponent implements OnInit {
   qualityNumer: string;
   qualityPIN: string;
   wynik: string;
+  qUserData:string;
   soapOpeartion: string;
   focusedInputName: string = 'QualityNumber';
 
@@ -33,6 +34,12 @@ export class BlocksComponent implements OnInit {
 
     this.serviceService.getResult().subscribe((data) => {
       this.wynik = data;
+
+      switch (this.soapOpeartion) {
+        case 'Login': {
+
+        }
+      }
     });
 
   }
@@ -87,4 +94,10 @@ export class BlocksComponent implements OnInit {
     this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
   }
 
+  getDeactivateLocks(): any {
+    this.soapOpeartion = `DeactivateLocks`;
+    const soapParameters = `<jobs>` +  '?' + `</jobs>
+                            <userData><UserData><UserId>` + this.qualityNumer +`<UserId></UserData></userData>`;
+    this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
+  }
 }
