@@ -12,9 +12,11 @@ import { LoginAppComponent } from './login-app/login-app.component';
 import { MainAppComponent } from './main-app/main-app.component';
 import { ItemsblockComponent } from './itemsblock/itemsblock.component';
 import { BlocksComponent } from './blocks/blocks.component';
+import { AngularFontAwesomeModule } from 'angular-font-awesome';
+
 @NgModule({
   declarations: [AppComponent, DemoComponent, LoginAppComponent, MainAppComponent, ItemsblockComponent, BlocksComponent],
-  imports: [BrowserModule, HttpClientModule, FormsModule, NgbModule, BarecodeScannerLivestreamModule],
+  imports: [BrowserModule, HttpClientModule, FormsModule, NgbModule, BarecodeScannerLivestreamModule, AngularFontAwesomeModule],
   providers: [ServiceService, DataService],
   bootstrap: [AppComponent],
 })
