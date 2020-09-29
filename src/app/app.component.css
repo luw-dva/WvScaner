@@ -1,6 +1,7 @@
 .language {
   /* or absolute, as appropriate */
   position: relative;
+  z-index: 99;
 
 }
 .language_icon{
@@ -8,4 +9,5 @@
   right: 0px;
   font-size: 30px;
   color: #FFC312;
+  z-index: 99;
   }
