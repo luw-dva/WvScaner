@@ -32,6 +32,8 @@ export class LoginAppComponent implements OnInit {
   entName: string;
   entParentName: string;
   entHasChildren: boolean = true;
+  userPcs: string;
+  userProcess: string;
   Can_confirm_single_orders:string;
   Ask_for_steps:string;
   Store_products_attr:string;
@@ -127,6 +129,18 @@ export class LoginAppComponent implements OnInit {
           break;
         }
 
+        case 'GetUserResult': {
+          if (this.wynik != 'false') {
+
+            this.userPcs =this.wynik.getElementsByTagName('Worker_pcs')[0].childNodes[0].nodeValue
+            this.dataService.setUserPcs(this.userPcs);
+            this.userProcess =this.wynik.getElementsByTagName('Worker_process')[0].childNodes[0].nodeValue
+            this.dataService.setUserProcess(this.userProcess);
+            console.log(this.userPcs);
+          }
+          break;
+        }
+
         case 'GetEntAndParentNameById': {
           if (this.wynik != 'false') {
             try{
@@ -191,7 +205,9 @@ export class LoginAppComponent implements OnInit {
         this.spanUserClass == 'input-group-prepend ok'
       ) {
 
+        this.islogin = true;
         this.isLogin.emit(2);
+
       }
     }
     });
@@ -201,6 +217,13 @@ export class LoginAppComponent implements OnInit {
   getUsers(): any {
     this.soapOpeartion = `ValidateUser`;
     const soapParameters = `<userId>` + this.userId + `</userId>`;
+    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
+  }
+
+  getUserData(): any {
+    this.soapOpeartion = `GetUserResult`;
+    const soapParameters = `<entityId>` + this.entityId + `</entityId>
+                            <worker>` + this.userId + `</worker>`;
     this.serviceService.soapCall(this.soapOpeartion, soapParameters);
   }
 

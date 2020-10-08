@@ -12,6 +12,8 @@ export class DataService {
   private lang = new Subject<number>();
   private language:number = 0;
   private userName:string;
+  private userPcs:string;
+  private userProcess:string;
   private entName:string;
   private blocks: Array<{ item: string; message: string; pos: string}>;
   private entId:string;
@@ -49,6 +51,22 @@ export class DataService {
 
   getEntName(){
     return this.entName;
+  }
+
+  setUserPcs(name:string){
+    this.userPcs = name;
+  }
+
+  getUserPcs(){
+    return this.userPcs;
+  }
+
+  setUserProcess(name:string){
+    this.userProcess = name;
+  }
+
+  getUserProcess(){
+    return this.userProcess;
   }
 
   setEntId(name:string){

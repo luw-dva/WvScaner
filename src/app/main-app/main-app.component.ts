@@ -13,7 +13,10 @@ export class MainAppComponent implements OnInit {
   constructor(
     private serviceService: ServiceService,
     private dataService: DataService
-  ) {}
+  ) {
+
+
+  }
 
   //Icons
   faPowerOff = faPowerOff;
@@ -24,13 +27,15 @@ export class MainAppComponent implements OnInit {
 
   userName: string;
   entities: string;
+  entId: string;
   entitiesParent: string;
+
 
   //Deklaracja zmiennych
   barCodeResult: string;
   soapOpeartion: string;
-  scannedQty: number = 0;
-  scannedPT: number = 0;
+  scannedQty: string = '0';
+  scannedPT: string = '0';
   staticLocationButtonClass: string = 'btn btn-warning';
   itemButtonClass: string = 'btn btn-warning';
   locksButtonClass: string = 'btn btn-warning';
@@ -38,6 +43,8 @@ export class MainAppComponent implements OnInit {
   isLocksActive: boolean = false;
   isSpecialItem: boolean = false;
   isBlocks: boolean = false;
+  userPcs: string = '0';
+  userProcess: string = '0';
   isStaticLocation: boolean = false;
   language: number;
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
@@ -60,6 +67,7 @@ export class MainAppComponent implements OnInit {
 
 
   ngOnInit(): void {
+
     this.serviceService.getResult().subscribe((data: any) => {
       this.wynik = data;
 
@@ -74,6 +82,18 @@ export class MainAppComponent implements OnInit {
           this.isSpecialItem = true;
         }
       }
+
+     if(this.soapOpeartion == 'GetUserResult'){
+        if (this.wynik != 'false') {
+          this.userPcs =this.wynik.getElementsByTagName('Worker_pcs')[0].childNodes[0].nodeValue
+          this.dataService.setUserPcs(this.userPcs);
+          this.userProcess =this.wynik.getElementsByTagName('Worker_process')[0].childNodes[0].nodeValue
+          this.dataService.setUserProcess(this.userProcess);
+          this.scannedPT = this.dataService.getUserProcess();
+          this.scannedQty = this.dataService.getUserPcs();
+        }
+      }
+
 
       if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
 
@@ -94,6 +114,7 @@ export class MainAppComponent implements OnInit {
 
     });
 
+
     this.language = this.dataService.getLanguageFirstTime();
     this.dictionaryChangeLanguage();
     this.dataService.getLanguage().subscribe((data) => {
@@ -101,9 +122,12 @@ export class MainAppComponent implements OnInit {
       this.dictionaryChangeLanguage();
     });
 
+
     this.userName = this.dataService.getUserName();
     this.entities = this.dataService.getEntName();
+    this.entId = this.dataService.getEntId();
     this.entitiesParent = this.dataService.getEntParentName();
+    this.getUserData();
   }
 
   dictionaryChangeLanguage() {
@@ -157,6 +181,13 @@ export class MainAppComponent implements OnInit {
       this.dataService.getEntParentName() +
       `</operation>`;
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
+  }
+
+  getUserData(): any {
+    this.soapOpeartion = `GetUserResult`;
+    const soapParameters = `<entityId>` + this.entId + `</entityId>
+                            <worker>` + this.userName + `</worker>`;
+    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
   }
 
   logout(): void {

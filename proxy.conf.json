@@ -1,8 +1,8 @@
 {
-  "/api": {
-      "target": "'http://dkvdc-wmes0001/MESServices/MESConfirmOperation.asmx?WSDL'",
-      "secure": false,
-      "logLevel": "debug",
-      "changeOrigin": true
+  "/*": {
+  "target": "https://dkvdc-wmes0001.dovista.org/",
+  "secure": false,
+  "changeOrigin": true,
+  "logLevel": "debug"
   }
 }

@@ -16,14 +16,14 @@
             <span class="input-group-text" autofocus><i><fa-icon [icon]="faUser"></fa-icon></i></span>
           </div>
           <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId"
-            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')" disabled>
+            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')" >
         </div>
         <div class="input-group form-group">
           <div [ngClass]="spanEntClass">
             <span class="input-group-text"><fa-icon [icon]="faIndustry"></fa-icon></span>
           </div>
           <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId"
-            (blur)="getEntity()" (focus)="getFocusedInputName('entInput')" disabled>
+            (blur)="getEntity()" (focus)="getFocusedInputName('entInput')" >
         </div>
       </div>
     </div>
