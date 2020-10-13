@@ -24,8 +24,7 @@ export class DemoComponent implements AfterViewInit {
     isCamIconHidden: boolean = true;
 
     ngAfterViewInit() {
-      this.barecodeScanner.start();
-
+    //  this.barecodeScanner.start();
     }
 
 
@@ -36,16 +35,17 @@ export class DemoComponent implements AfterViewInit {
         this.barCodeResult.emit(this.barcodeValue);
         this.isCamActive = false;
         this.isCamIconHidden = true;
+        this.barecodeScanner.stop();
       }
     }
 
     onStarted(started){
       console.log(started);
+      this.barecodeScanner.start();
     }
 
-
-
     changeCamActive(){
+      this.barecodeScanner.start();
       this.isCamActive = !this.isCamActive;
       this.isCamIconHidden = !this.isCamIconHidden;
       this.barcodeValue = '';

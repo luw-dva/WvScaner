@@ -14,6 +14,11 @@ export class AppComponent implements OnInit {
 
   languageName: string = '[PL]';
   viewNumber: number = 1;
+  scanner:string ;
+
+  scannerChange(){
+
+  }
 
   ngOnInit(): void {
     this.dataService.setLanguage(0);

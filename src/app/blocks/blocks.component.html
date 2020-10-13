@@ -21,22 +21,22 @@
         </div>
 
         <div class="input-group form-group">
-          <div class='input-group-prepend'>
+          <div [ngClass]="spanUserClass">
             <span class="input-group-text"><fa-icon [icon]="faUserLock"></fa-icon></span>
           </div>
             <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityNumber' [(ngModel)]="qualityNumer" placeholder={{qualityWorkerNumber}}>
           </div>
-        </div>
+
       <div class="input-group form-group">
-        <div class='input-group-prepend'>
+        <div [ngClass]="spanPinClass">
           <span class="input-group-text"><fa-icon [icon]="faKey"></fa-icon></span>
         </div>
           <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityPIN' [(ngModel)]="qualityPIN" placeholder='PIN' type="number" pattern="[0-9][0-9][0-9][0-9]" inputmode="numeric">
         </div>
+
       </div>
+      <button style="margin:2px; z-index: 99;" class='btn btn-secondary'>{{confirmButton}}</button>
+      <button style="margin:2px; z-index: 99;" class='btn btn-warning' (click)="goToMainView()">{{backButton}}</button>
 
-
-      <button style="margin:2px; z-index: 99;" class='btn btn-warning'>{{confirmButton}}</button>
-      <button style="margin:2px; z-index: 99;" class='btn btn-warning' (click)="goToMainView()">Wróć</button>
-
+  </div>
 </div>

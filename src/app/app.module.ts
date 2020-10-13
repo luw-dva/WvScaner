@@ -14,7 +14,6 @@ import { ItemsblockComponent } from './itemsblock/itemsblock.component';
 import { BlocksComponent } from './blocks/blocks.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
-
 @NgModule({
   declarations: [AppComponent, DemoComponent, LoginAppComponent, MainAppComponent, ItemsblockComponent, BlocksComponent],
   imports: [BrowserModule, HttpClientModule, FormsModule, NgbModule, BarecodeScannerLivestreamModule, FontAwesomeModule, ],

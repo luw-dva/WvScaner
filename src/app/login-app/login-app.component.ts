@@ -1,7 +1,7 @@
 import { DataService } from './../data.service';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { faIndustry, faUser, faQrcode } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -34,6 +34,7 @@ export class LoginAppComponent implements OnInit {
   entHasChildren: boolean = true;
   userPcs: string;
   userProcess: string;
+  scanner: string;
   Can_confirm_single_orders:string;
   Ask_for_steps:string;
   Store_products_attr:string;
@@ -73,6 +74,22 @@ export class LoginAppComponent implements OnInit {
     this.focusedInputName = name;
   }
 
+  scannerChange(): void {
+
+    if(this.scanner.length > 7){
+      this.userId = this.scanner;
+      this.Input_worker = this.scanner
+      this.getUsers();
+      this.scanner = '';
+    } else {
+      this.entityId = this.scanner;
+      this.Input_position = this.scanner
+      this.getEntity();
+      this.scanner = '';
+    }
+
+  }
+
   //Operacje do wykonania po zlokalizowaniu kodu kreskowego
   //Skaner kodów kreskowych - biblioteka Quagga - https://serratus.github.io/quaggaJS/
   barcodeEvent(status: string): void {
@@ -96,8 +113,22 @@ export class LoginAppComponent implements OnInit {
     }
   }
 
+
+  @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
+  focusOnScanner(){
+    setTimeout(() => {
+      this.scanInput.nativeElement.setAttribute('readonly', 'readonly');
+      this.scanInput.nativeElement.focus();
+      setTimeout(() => {
+        this.scanInput.nativeElement.removeAttribute('readonly', 'readonly');
+      }, 50);
+    }, 50
+    )
+  }
+
   ngOnInit(): void {
 
+    this.focusOnScanner();
     //Uruchomienie LanguageServisu
     this.language = this.dataService.getLanguageFirstTime();
 
@@ -238,4 +269,6 @@ export class LoginAppComponent implements OnInit {
     const soapParameters = `<entId>` + this.entityId + `</entId>`;
     this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
   }
+
+
 }

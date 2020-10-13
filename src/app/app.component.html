@@ -1,6 +1,7 @@
 <div class="language">
  <span class="language_icon" (click)="changeLanguage()">{{languageName}}</span>
 </div>
+<!-- <input #scanInput  type='text' autofocus style='opacity: 0; height: 1;' [(ngModel)]="scanner" (change)="scannerChange()"> -->
 
 <div [ngSwitch]='viewNumber' style="position: relative;">
   <ng-template ngSwitchCase=1>

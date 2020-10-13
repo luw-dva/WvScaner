@@ -13,17 +13,17 @@
       <div class="card-body">
         <div class="input-group form-group">
           <div [ngClass]="spanUserClass">
-            <span class="input-group-text" autofocus><i><fa-icon [icon]="faUser"></fa-icon></i></span>
+            <span class="input-group-text"><i><fa-icon [icon]="faUser"></fa-icon></i></span>
           </div>
           <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId"
-            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')" >
+            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')" disabled>
         </div>
         <div class="input-group form-group">
           <div [ngClass]="spanEntClass">
             <span class="input-group-text"><fa-icon [icon]="faIndustry"></fa-icon></span>
           </div>
           <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId"
-            (blur)="getEntity()" (focus)="getFocusedInputName('entInput')" >
+            (blur)="getEntity()" (focus)="getFocusedInputName('entInput')" disabled>
         </div>
       </div>
     </div>
@@ -37,12 +37,16 @@
     </div>
   </div>
   <div class="camera">
-    <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo>
+    <!-- <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo> -->
   </div>
   <!-- <div id="intro" class='d-flex justify-content-end social_icon'>
     <div id="down_arrow">
       <span><i class="fas fa-camera"></i></span>
     </div>
-  </div> -->
+  </div>
+style='opacity: 0; height:1px; width: 1px;'
+-->
 
 </div>
+
+<input #scanInput type='text' autofocus  style='opacity: 0' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">

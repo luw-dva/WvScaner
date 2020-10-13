@@ -6,13 +6,13 @@ import { HttpClient } from '@angular/common/http';
 export class ServiceService {
   constructor(private http: HttpClient) {}
   private WSDL =
-    'https://dkvdc-wmes0001.dovista.org/MESServices/MESConfirmOperation.asmx?WSDL';
+    'http://dkvdc-wmes0001/MESServices/MESConfirmOperation.asmx?WSDL';
   private WSDLgs =
-    'https://dkvdc-wmes0001.dovista.org/MESServices/GeneralServices.asmx?WSDL';
+    'http://dkvdc-wmes0001/MESServices/GeneralServices.asmx?WSDL';
   private WSDLus =
-    'https://dkvdc-wmes0001.dovista.org/MESServices/UserServices.asmx?WSDL';
+    'http://dkvdc-wmes0001/MESServices/UserServices.asmx?WSDL';
   private WSDLqs =
-    'https://dkvdc-wmes0001.dovista.org/MESServices/QualityLockServices.asmx?WSDL';
+    'http://dkvdc-wmes0001/MESServices/QualityLockServices.asmx?WSDL';
   private responseSOAP: any;
   private result = new Subject<string>();
 
@@ -44,22 +44,19 @@ export class ServiceService {
       `</` + operation + `>
       </soap12:Body>
       </soap12:Envelope>`;
-
+      console.log(parameters);
       xmlhttp.onreadystatechange = () => {
 
         if (xmlhttp.readyState == 4) {
           if (xmlhttp.status == 200) {
             console.log(xmlhttp.getAllResponseHeaders());
             const xml = xmlhttp.responseXML;
-
-
-              console.log(xml);
-              this.responseSOAP = this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0];
-
+            this.responseSOAP = this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0];
           } else if (xmlhttp.status == 500) {
             this.responseSOAP = 'false';
           }
-
+          console.log(operation);
+          console.log(this.responseSOAP);
           this.result.next(this.responseSOAP);
           this.responseSOAP = '';
         }
@@ -69,8 +66,9 @@ export class ServiceService {
     xmlhttp.open('POST', WSDL, true);
     xmlhttp.setRequestHeader('Content-Type', 'text/xml');
     xmlhttp.responseType = 'document';
-//    xmlhttp.withCredentials = true;
+    xmlhttp.withCredentials = false;
     xmlhttp.send(sr);
+
     }
 
   getResult(): Observable<string> {

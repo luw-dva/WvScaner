@@ -3,6 +3,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
 import { faUserLock, faKey, faArrowAltCircleLeft, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
+import { XmlParser } from '@angular/compiler';
 
 @Component({
   selector: 'app-blocks',
@@ -27,6 +28,8 @@ export class BlocksComponent implements OnInit {
   qUserData:string;
   soapOpeartion: string;
   focusedInputName: string = 'QualityNumber';
+  spanUserClass: string = 'input-group-prepend';
+  spanPinClass: string = 'input-group-prepend';
 
   ngOnInit(): void {
     this.childBLock = this.dataService.getBlocks();
@@ -43,15 +46,21 @@ export class BlocksComponent implements OnInit {
 
       switch (this.soapOpeartion) {
         case 'Login': {
-
+          if(this.wynik == 'false'){
+            this.spanUserClass = 'input-group-prepend nok';
+            this.spanPinClass = 'input-group-prepend nok';
+          }else{
+            this.spanUserClass = 'input-group-prepend ok';
+            this.spanPinClass = 'input-group-prepend ok';
+          }
         }
       }
     });
-
   }
 
   //Dictionary
   language: number;
+  backButton: string;
   block_header: string;
   qualityWorkerNumber: string;
   confirmButton: string;
@@ -60,6 +69,7 @@ export class BlocksComponent implements OnInit {
     this.block_header = dict.get('block_header')[this.language];
     this.qualityWorkerNumber = dict.get('qualityWorkerNumber')[this.language];
     this.confirmButton = dict.get('confirmButton')[this.language];
+    this.backButton = dict.get('back')[this.language];
   }
 
   //Pobieranie nazwy obecnie aktywnego pola
@@ -83,6 +93,10 @@ export class BlocksComponent implements OnInit {
         break;
       }
     }
+
+    if (this.qualityNumer.length != 0 && this.qualityPIN.length != 0){
+      this.getLogin();
+    }
   }
 
   @Output()
@@ -101,9 +115,12 @@ export class BlocksComponent implements OnInit {
   }
 
   getDeactivateLocks(): any {
+    let xml_doc = new DOMParser;
+    xml_doc.parseFromString(`<UserData><UserId>` + this.qualityNumer +`<UserId></UserData>`, 'text/xml');
+
     this.soapOpeartion = `DeactivateLocks`;
-    const soapParameters = `<jobs>` +  '?' + `</jobs>
-                            <userData><UserData><UserId>` + this.qualityNumer +`<UserId></UserData></userData>`;
-    this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
+    const soapParameters = `<jobs>` +  '?' + `</jobs>` +
+                          xml_doc.parseFromString('<UserData><UserId>` + this.qualityNumer +`<UserId></UserData>', 'text/xml');
+    this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
 }

@@ -1,28 +1,16 @@
 <div class="container">
-  <div>
-    <img src="../assets/logo.png" width="280" height="65" class="Logo">
-  </div>
-  <!--<div [ngSwitch]="alertType">
-     <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin-top: 10px;">
-      {{alertMessage}}
-    </div>
-    <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin-top: 10px;">
-      {{alertMessage}}
-    </div>
-  </div> -->
-
   <div class="d-flex justify-content-center h-100">
     <div class="card">
-      <div class="card-header" style="margin:0px; padding-top: 5px;">
-        <h4>{{txtScanner}}</h4>
-        <div class="d-flex justify-content-end social_icon">
+      <div class="card-header justify-content-start" style="margin:0px; padding-top: 5px;">
+
+        <div class="d-flex  social_icon"  >
           <span><fa-icon [icon]="faPowerOff" (click)="logout()"></fa-icon></span>
         </div>
       </div>
       <div class="card-body">
         <div>
           <p>
-          <span><label>{{txtPosition}}: </label> {{entities}}</span>
+          <span><label>Pos: </label> {{entities}}</span>
           <span><label>{{txtWorkcenter}}: </label> {{entitiesParent}}</span>
           <span><label>{{txtWorker}}: </label> {{userName}}</span>
         </p>
@@ -41,11 +29,10 @@
             </table>
           </h3>
           <div>
-            <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo>
+            <input #scanInput type='text' autofocus  style='opacity: 1' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
+            <!-- <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo> -->
           </div>
         </div>
-        <div class="input-group form-group"></div>
-        <div class="input-group form-group"></div>
       </div>
 
       <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
@@ -56,4 +43,13 @@
     </div>
     <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute;' [childBLock]="itemsResult" ></app-itemsblock>
   </div>
+</div>
+
+<div [ngSwitch]="alertType">
+  <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
+   {{alertMessage}}
+ </div>
+ <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
+   {{alertMessage}}
+ </div>
 </div>

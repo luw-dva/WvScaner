@@ -1,6 +1,6 @@
 import { DataService } from './../data.service';
 import { dict } from './../dictionary';
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
 import { ServiceService } from '../service.service';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 
@@ -13,10 +13,7 @@ export class MainAppComponent implements OnInit {
   constructor(
     private serviceService: ServiceService,
     private dataService: DataService
-  ) {
-
-
-  }
+  ) {}
 
   //Icons
   faPowerOff = faPowerOff;
@@ -25,13 +22,12 @@ export class MainAppComponent implements OnInit {
   @Output()
   isLogin = new EventEmitter<number>();
 
+  //Deklaracja zmiennych
   userName: string;
   entities: string;
   entId: string;
+  scanner: string;
   entitiesParent: string;
-
-
-  //Deklaracja zmiennych
   barCodeResult: string;
   soapOpeartion: string;
   scannedQty: string = '0';
@@ -58,16 +54,27 @@ export class MainAppComponent implements OnInit {
   txtResult: string;
   txtItems: string;
   txtBlocks: string;
+  txtNoBlocks: string;
   txtWorkcenter: string;
   txtLocation: string;
   itemsResult: Array<{ item: string; message: string }> = [];
   blockResult: Array<{ item: string; message: string; pos: string}> = [];
-
   parser = new DOMParser();
 
+  @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
+  focusOnScanner(){
+    setTimeout(() => {
+      this.scanInput.nativeElement.setAttribute('readonly', 'readonly');
+      this.scanInput.nativeElement.focus();
+      setTimeout(() => {
+        this.scanInput.nativeElement.removeAttribute('readonly', 'readonly');
+      }, 50);
+    }, 50
+    )
+  }
 
   ngOnInit(): void {
-
+    this.focusOnScanner();
     this.serviceService.getResult().subscribe((data: any) => {
       this.wynik = data;
 
@@ -75,6 +82,7 @@ export class MainAppComponent implements OnInit {
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
           for (
             let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
+
             this.itemsResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
               message: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('message')[0].childNodes[0].nodeValue,
             };
@@ -96,20 +104,46 @@ export class MainAppComponent implements OnInit {
 
 
       if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
-
+        console.log(this.wynik.childNodes[1].hasChildNodes());
+        if (this.wynik.childNodes[1].hasChildNodes()){
         let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
         if (xmlDoc.getElementsByTagName('Locks').length) {
+          console.log(xmlDoc.childNodes.length);
+          console.log(xmlDoc);
           for (
-            let i = 0; i < xmlDoc.getElementsByTagName('Locks').length; i++) {
-            this.blockResult[i] = {item: xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('Notes')[0].childNodes[0].nodeValue,
-              message: xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('LockDescription')[0].childNodes[0].nodeValue,
-              pos: this.wynik.getElementsByTagName('BundlePosition')[0].childNodes[0].nodeValue,
-            };
+            let i = 0; i < xmlDoc.getElementsByTagName('Locks')[0].childNodes.length; i++) {
+              console.log(i + '')
+              let items = '';
+              let messages = '';
+              let poss = '';
+
+              try{
+                items = xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('Notes')[0].childNodes[0].nodeValue;
+              }catch(err){};
+
+              try{
+                messages = xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('LockDescription')[0].childNodes[0].nodeValue;
+              }catch(err){};
+
+              try{
+                poss = this.wynik.getElementsByTagName('BundlePosition')[0].childNodes[0].nodeValue;
+              }catch(err){};
+
+              if(items.length + messages.length + poss.length > 0 ){
+              this.blockResult[i] = { item: items, message: messages, pos: poss };
+              }
           }
           this.isBlocks = true;
           this.dataService.setBlocks(this.blockResult);
         }
         this.isLogin.emit(3);
+      }else{
+        this.alertType = 1;
+        this.alertMessage = this.txtNoBlocks;
+        setTimeout(() => {
+          this.alertType = 0;
+        }, 2000);
+      }
       }
 
     });
@@ -122,7 +156,6 @@ export class MainAppComponent implements OnInit {
       this.dictionaryChangeLanguage();
     });
 
-
     this.userName = this.dataService.getUserName();
     this.entities = this.dataService.getEntName();
     this.entId = this.dataService.getEntId();
@@ -131,6 +164,7 @@ export class MainAppComponent implements OnInit {
   }
 
   dictionaryChangeLanguage() {
+    this.txtNoBlocks = dict.get('NoLocks')[this.language];
     this.txtWorker = dict.get('Worker')[this.language];
     this.txtWorkcenter = dict.get('Workcenter')[this.language];
     this.txtPosition = dict.get('Position')[this.language];
@@ -142,6 +176,18 @@ export class MainAppComponent implements OnInit {
     this.txtScanner = dict.get('Scanner')[this.language];
   }
 
+  scannerChange(): void {
+    if (this.isItemActive) {
+      this.getGetLocksSpecialItemsByWo();
+      this.scanner = '';
+    }
+
+    if (this.isLocksActive) {
+      this.getActiveLocksByWoOperation();
+      this.scanner = '';
+    }
+  }
+
   //Skaner - gdy odczyta kod kreskowy zapisuje do zmiennej
   //biblioteka Quagga - https://serratus.github.io/quaggaJS/
   barcodeEvent(status: string): void {
@@ -150,11 +196,12 @@ export class MainAppComponent implements OnInit {
 
     if (this.isItemActive) {
       this.getGetLocksSpecialItemsByWo();
+      this.scanner = '';
     }
 
     if (this.isLocksActive) {
       this.getActiveLocksByWoOperation();
-
+      this.scanner = '';
     }
   }
 
@@ -162,31 +209,44 @@ export class MainAppComponent implements OnInit {
   getGetLocksSpecialItemsByWo(): any {
     this.soapOpeartion = `GetLocksSpecialItemsByWo`;
     const soapParameters =
-      `<woId>` +
-      this.barCodeResult +
-      `</woId>` +
-      `<entityId>` +
-      this.dataService.getEntId() +
-      `</entityId>`;
+      `<woId>` + this.scanner + `</woId>` +
+      `<entityId>` + this.entId + `</entityId>`;
+    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
+  }
+
+  confirmOperation(): any {
+    this.soapOpeartion = `ConfirmOperation`;
+    const soapParameters =
+      `<entityId>` +  this.entId +  `</entityId>` +
+      `<woId>` + this.barCodeResult + `</woId>` +
+      `<operId>` + this.entitiesParent + `</operId>` +
+      `<worker>` +this.userName + `</worker>`;
+    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
+  }
+
+  confirmBundle(): any {
+    this.soapOpeartion = `ConfirmBundle`;
+    const soapParameters =
+      `<entityId>` +  this.entId +  `</entityId>` +
+      `<bundle>` + this.scanner + `</bundle>` +
+      `<operId>` + this.entitiesParent + `</operId>` +
+      `<worker>` +this.userName + `</worker>`;
     this.serviceService.soapCall(this.soapOpeartion, soapParameters);
   }
 
   getActiveLocksByWoOperation(): any {
     this.soapOpeartion = `GetActiveLocksByWoOperation`;
     const soapParameters =
-      `<wo>` +
-      this.barCodeResult +
-      `</wo>` +
-      `<operation>` +
-      this.dataService.getEntParentName() +
-      `</operation>`;
+      `<wo>` + this.scanner + `</wo>` +
+      `<operation>` + 'T5000120' + `</operation>`;
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
 
   getUserData(): any {
     this.soapOpeartion = `GetUserResult`;
-    const soapParameters = `<entityId>` + this.entId + `</entityId>
-                            <worker>` + this.userName + `</worker>`;
+    const soapParameters =
+      `<entityId>` + this.entId + `</entityId>
+      <worker>` + this.userName + `</worker>`;
     this.serviceService.soapCall(this.soapOpeartion, soapParameters);
   }
 
