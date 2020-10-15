@@ -58,7 +58,7 @@ export class MainAppComponent implements OnInit {
   txtWorkcenter: string;
   txtLocation: string;
   itemsResult: Array<{ item: string; message: string }> = [];
-  blockResult: Array<{ item: string; message: string; pos: string}> = [];
+  blockResult: Array<{ item: string; message: string; pos: string; qConfirm}> = [];
   parser = new DOMParser();
 
   @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
@@ -89,6 +89,7 @@ export class MainAppComponent implements OnInit {
           }
           this.isSpecialItem = true;
         }
+        this.soapOpeartion = ''
       }
 
      if(this.soapOpeartion == 'GetUserResult'){
@@ -99,23 +100,22 @@ export class MainAppComponent implements OnInit {
           this.dataService.setUserProcess(this.userProcess);
           this.scannedPT = this.dataService.getUserProcess();
           this.scannedQty = this.dataService.getUserPcs();
+
         }
+        this.soapOpeartion = ''
       }
 
 
       if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
-        console.log(this.wynik.childNodes[1].hasChildNodes());
         if (this.wynik.childNodes[1].hasChildNodes()){
-        let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
-        if (xmlDoc.getElementsByTagName('Locks').length) {
-          console.log(xmlDoc.childNodes.length);
-          console.log(xmlDoc);
-          for (
-            let i = 0; i < xmlDoc.getElementsByTagName('Locks')[0].childNodes.length; i++) {
-              console.log(i + '')
+          this.dataService.setLockWoData(this.wynik);
+          let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
+          if (xmlDoc.getElementsByTagName('Locks').length) {
+            for (let i = 0; i < xmlDoc.getElementsByTagName('Locks')[0].childNodes.length; i++) {
               let items = '';
               let messages = '';
               let poss = '';
+              let qConf = '';
 
               try{
                 items = xmlDoc.getElementsByTagName('Lock')[i].getElementsByTagName('Notes')[0].childNodes[0].nodeValue;
@@ -129,21 +129,34 @@ export class MainAppComponent implements OnInit {
                 poss = this.wynik.getElementsByTagName('BundlePosition')[0].childNodes[0].nodeValue;
               }catch(err){};
 
-              if(items.length + messages.length + poss.length > 0 ){
-              this.blockResult[i] = { item: items, message: messages, pos: poss };
+              try{
+                qConf = xmlDoc.getElementsByTagName('Lock')[i].getAttributeNode("unlockable").value;
+                console.log(qConf);
+              }catch(err){};
+
+              if(items.length + messages.length + poss.length > 5 ){
+              this.blockResult[i] = { item: items, message: messages, pos: poss, qConfirm: qConf };
               }
           }
           this.isBlocks = true;
           this.dataService.setBlocks(this.blockResult);
         }
+
         this.isLogin.emit(3);
+        this.soapOpeartion = ''
       }else{
+
+        if(this.isLocksActive){
         this.alertType = 1;
         this.alertMessage = this.txtNoBlocks;
         setTimeout(() => {
           this.alertType = 0;
         }, 2000);
+      }else{
+        this.confirmOperation();
       }
+    }
+      this.soapOpeartion = ''
       }
 
     });
@@ -183,27 +196,19 @@ export class MainAppComponent implements OnInit {
     }
 
     if (this.isLocksActive) {
+      this.dataService.setBlockJust2Check(true);
+      this.getActiveLocksByWoOperation();
+      this.scanner = '';
+    }
+
+    if (!this.isItemActive && !this.isLocksActive){
+      this.dataService.setWo(this.scanner);
+      this.dataService.setBlockJust2Check(false);
       this.getActiveLocksByWoOperation();
       this.scanner = '';
     }
   }
 
-  //Skaner - gdy odczyta kod kreskowy zapisuje do zmiennej
-  //biblioteka Quagga - https://serratus.github.io/quaggaJS/
-  barcodeEvent(status: string): void {
-    //Wpisz kod kreskowy do aktywnego okna
-    this.barCodeResult = status;
-
-    if (this.isItemActive) {
-      this.getGetLocksSpecialItemsByWo();
-      this.scanner = '';
-    }
-
-    if (this.isLocksActive) {
-      this.getActiveLocksByWoOperation();
-      this.scanner = '';
-    }
-  }
 
   //Webserwis - obsluga wydarzenia
   getGetLocksSpecialItemsByWo(): any {
@@ -238,7 +243,7 @@ export class MainAppComponent implements OnInit {
     this.soapOpeartion = `GetActiveLocksByWoOperation`;
     const soapParameters =
       `<wo>` + this.scanner + `</wo>` +
-      `<operation>` + 'T5000120' + `</operation>`;
+      `<operation>` + this.entitiesParent + `</operation>`;
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
 

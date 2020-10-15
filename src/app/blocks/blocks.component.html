@@ -5,38 +5,52 @@
   <div class="d-flex justify-content-center h-100">
     <div class="card">
       <div class="card-header" >
-      <h4>{{block_header}}</h4>
+        <h4>{{block_header}}</h4>
       </div>
       <div class="card-body">
         <div class='blocklist'>
-            <div *ngFor="let item of childBLock">
-              <p><span><h4>{{item.message}}</h4></span><br>
-                <span>Pos: {{item.pos}}</span><br>
-                <span><b>{{item.item}}</b></span></p>
+            <div>
+              <p><span><h4>{{childBLock[childBLockElement].message}}</h4></span><br>
+                <span>Pos: {{childBLock[childBLockElement].pos}}</span><br>
+                <span><b>{{childBLock[childBLockElement].item}}</b></span></p>
             </div>
+
             <div id="outer">
-              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;" ><fa-icon [icon]="faArrowAltCircleLeft"></fa-icon></button></div>
-              <div class="inner"><button type="submit" class='btn btn-warning' onClick="return false;"><fa-icon [icon]="faArrowAltCircleRight"></fa-icon></button></div>
+              <div class="inner"><button type="submit" name="left" [ngClass]="leftClass" (click)="goLeft()" ><fa-icon [icon]="faArrowAltCircleLeft"></fa-icon></button></div>
+              <div class="inner"><button type="submit" name="right" [ngClass]="rightClass" (click)="goRight()"><fa-icon [icon]="faArrowAltCircleRight"></fa-icon></button></div>
             </div>
         </div>
-
+        <div [hidden]="isBlock2Check || isBlock2Check2">
         <div class="input-group form-group">
           <div [ngClass]="spanUserClass">
             <span class="input-group-text"><fa-icon [icon]="faUserLock"></fa-icon></span>
           </div>
-            <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityNumber' [(ngModel)]="qualityNumer" placeholder={{qualityWorkerNumber}}>
+            <input type="text" maxlength=4 class="form-control"  name='QualityNumber' disabled [(ngModel)]="qualityNumer" placeholder={{qualityWorkerNumber}}>
           </div>
 
       <div class="input-group form-group">
         <div [ngClass]="spanPinClass">
           <span class="input-group-text"><fa-icon [icon]="faKey"></fa-icon></span>
         </div>
-          <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityPIN' [(ngModel)]="qualityPIN" placeholder='PIN' type="number" pattern="[0-9][0-9][0-9][0-9]" inputmode="numeric">
+          <input type="text" maxlength=4 class="form-control" id='password-3' name='QualityPIN' disabled [(ngModel)]="qualityPIN" placeholder='PIN' type="number" pattern="[0-9][0-9][0-9][0-9]" inputmode="numeric">
         </div>
-
       </div>
-      <button style="margin:2px; z-index: 99;" class='btn btn-secondary'>{{confirmButton}}</button>
+      </div>
+      <button style="margin:2px; z-index: 99;" [ngClass]="btnClass" (click)="DeactivateWoLocks()" [hidden]="isBlock2Check">{{confirmButton}}</button>
       <button style="margin:2px; z-index: 99;" class='btn btn-warning' (click)="goToMainView()">{{backButton}}</button>
-
+   </div>
   </div>
 </div>
+<div [ngSwitch]="alertType">
+  <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
+   {{alertMessage}}
+ </div>
+ <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
+   {{alertMessage}}
+ </div>
+ <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 10px;">
+  {{alertMessage}}
+</div>
+</div>
+
+<input #scanInput type='text' autofocus  style='opacity: 0; height: 1px;' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">

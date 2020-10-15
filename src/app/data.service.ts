@@ -13,9 +13,12 @@ export class DataService {
   private language:number = 0;
   private userName:string;
   private userPcs:string;
+  private lockWoData:any;
+  private WO: string;
+  private blockJust2Check: boolean = false;
   private userProcess:string;
   private entName:string;
-  private blocks: Array<{ item: string; message: string; pos: string}>;
+  private blocks: Array<{ item: string; message: string; pos: string; qConfirm: string }>;
   private entId:string;
   private entParentName: string;
   private Can_confirm_single_orders:string;
@@ -33,11 +36,11 @@ export class DataService {
     return this.lang.asObservable();
   }
 
-  setBlocks(block: Array<{ item: string; message: string; pos: string}>){
+  setBlocks(block: Array<{ item: string; message: string; pos: string; qConfirm: string}>){
     this.blocks = block;
 }
 
-  getBlocks(): Array<{ item: string; message: string; pos: string}> {
+  getBlocks(): Array<{ item: string; message: string; pos: string, qConfirm: string}> {
       return this.blocks;
   }
 
@@ -51,6 +54,30 @@ export class DataService {
 
   getEntName(){
     return this.entName;
+  }
+
+  setWo(name:string){
+    this.WO = name;
+  }
+
+  getWo(){
+    return this.WO;
+  }
+
+  setBlockJust2Check(name:boolean){
+    this.blockJust2Check = name;
+  }
+
+  getBlockJust2Check(){
+    return this.blockJust2Check;
+  }
+
+  setLockWoData(name:any){
+    this.lockWoData = name;
+  }
+
+  getLockWoData(){
+    return this.lockWoData;
   }
 
   setUserPcs(name:string){

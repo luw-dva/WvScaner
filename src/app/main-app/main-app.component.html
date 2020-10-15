@@ -1,9 +1,9 @@
 <div class="container">
   <div class="d-flex justify-content-center h-100">
     <div class="card">
-      <div class="card-header justify-content-start" style="margin:0px; padding-top: 5px;">
+      <div style="margin:0px;">
 
-        <div class="d-flex  social_icon"  >
+        <div class="social_icon" style="position: relative; margin-left: 30px;">
           <span><fa-icon [icon]="faPowerOff" (click)="logout()"></fa-icon></span>
         </div>
       </div>
@@ -29,7 +29,7 @@
             </table>
           </h3>
           <div>
-            <input #scanInput type='text' autofocus  style='opacity: 1' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
+            <input #scanInput type='text' autofocus  style='opacity: 0' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
             <!-- <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo> -->
           </div>
         </div>
@@ -41,15 +41,17 @@
       <button [hidden]="!isStaticLocation" style="margin:2px; z-index: 99;" [ngClass]="staticLocationButtonClass">{{txtLocation}}</button>
 
     </div>
-    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute;' [childBLock]="itemsResult" ></app-itemsblock>
+    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute; margin-top: 10px;' [childBLock]="itemsResult" ></app-itemsblock>
   </div>
 </div>
-
 <div [ngSwitch]="alertType">
   <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
-   {{alertMessage}}
+  {{alertMessage}}
  </div>
  <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
-   {{alertMessage}}
+  {{alertMessage}}
  </div>
+ <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 10px;">
+  {{alertMessage}}
+</div>
 </div>

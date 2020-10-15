@@ -62,13 +62,11 @@ export class ServiceService {
         }
       };
     // Send the POST request.
-
     xmlhttp.open('POST', WSDL, true);
     xmlhttp.setRequestHeader('Content-Type', 'text/xml');
     xmlhttp.responseType = 'document';
     xmlhttp.withCredentials = false;
     xmlhttp.send(sr);
-
     }
 
   getResult(): Observable<string> {
