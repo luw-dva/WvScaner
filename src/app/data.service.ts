@@ -15,6 +15,7 @@ export class DataService {
   private userPcs:string;
   private lockWoData:any;
   private WO: string;
+  private xml;
   private blockJust2Check: boolean = false;
   private userProcess:string;
   private entName:string;
@@ -35,6 +36,14 @@ export class DataService {
   getLanguage(): Observable<number> {
     return this.lang.asObservable();
   }
+
+  setXml(num){
+    this.xml = num;
+}
+
+getXml() {
+return this.xml;
+}
 
   setBlocks(block: Array<{ item: string; message: string; pos: string; qConfirm: string}>){
     this.blocks = block;

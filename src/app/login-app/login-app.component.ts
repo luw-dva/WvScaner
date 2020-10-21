@@ -1,6 +1,8 @@
+import { XmlParser } from '@angular/compiler';
+import { ServiceService } from './../service.service';
+import { ServiceMethod } from './../service.method';
 import { DataService } from './../data.service';
 import { dict } from './../dictionary';
-import { ServiceService } from './../service.service';
 import { Component, OnInit, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { faIndustry, faUser, faQrcode } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,18 +16,20 @@ export class LoginAppComponent implements OnInit {
   constructor(
     private serviceService: ServiceService,
     private dataService: DataService
-  ) { }
+  ) {}
 
+//------DEKLARACJA ZMIENNYCH------
   //Icons
   faIndustry = faIndustry;
   faUser = faUser;
   faQrcode = faQrcode;
+  serviceMethod = new ServiceMethod(this.serviceService);
 
   //Emitery// Bindowanie danych logowania
   @Output()
   isLogin = new EventEmitter<number>();
 
-  //Deklaracja zmiennych
+  //Deklaracja zmiennych standardowych
   userId: string;
   language: number;
   entityId: string;
@@ -40,26 +44,24 @@ export class LoginAppComponent implements OnInit {
   Store_products_attr:string;
   Can_type_location:string;
   Allow_static_location: string;
-  focusedInputName: string = 'userInput';
   soapOpeartion: string;
   soapParameters = '';
   islogin: boolean = false;
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
   alertMessage: string = '';
-  barcodeValue;
   spanUserClass = 'input-group-prepend';
   spanEntClass = 'input-group-prepend';
   wynik: any; //odpowiedź web-serwisu
-  title = 'Skaner';
 
+//------TŁUMACZENIA------
+  //Obsługa słownika dla wielu języków odbywa się za pośrednictwem klasy dictionary.ts
+  //Deklaracja zmiennych tekstowych, które zostaną pobrane dla danego widoku
   Header_login: string;
   Input_worker: string;
   Input_position: string;
   Message1: string;
   Message2: string;
   Message3: string;
-
-  //Dictionary
   dictionaryChangeLanguage() {
     this.Header_login = dict.get('Header_login')[this.language];
     this.Input_worker = dict.get('Worker')[this.language];
@@ -69,69 +71,47 @@ export class LoginAppComponent implements OnInit {
     this.Message3 = dict.get('Message3')[this.language];
   }
 
-  //Pobieranie nazwy obecnie aktywnego pola
-  getFocusedInputName(name: string) {
-    this.focusedInputName = name;
-  }
-
-  scannerChange(): void {
-
-    if(this.scanner.length > 7){
-      this.userId = this.scanner;
-      this.Input_worker = this.scanner
-      this.getUsers();
-      this.scanner = '';
-    } else {
-      this.entityId = this.scanner;
-      this.Input_position = this.scanner
-      this.getEntity();
-      this.scanner = '';
-    }
-
-  }
-
-  //Operacje do wykonania po zlokalizowaniu kodu kreskowego
-  //Skaner kodów kreskowych - biblioteka Quagga - https://serratus.github.io/quaggaJS/
-  barcodeEvent(status: string): void {
-    //Wpisz kod kreskowy do aktywnego okna
-    (<HTMLInputElement>(
-      document.getElementById(this.focusedInputName)
-    )).value = status;
-    //Wywołanie odpowiedniego webservisu
-    switch (this.focusedInputName) {
-      case 'userInput': {
-        this.userId = status;
-        this.getUsers();
-        this.focusedInputName = 'entInput';
-        break;
-      }
-      case 'entInput': {
-        this.entityId = status;
-        this.getEntity();
-        break;
-      }
-    }
-  }
-
-
+//------POBIERANIE DANYCH ZE SKANERA------
+  //Scaner odczytuje dane z kodu kreskowego i wprowadza go w aktywne pole tekstowe.
+  //Jeśli aktywne nie jest żadne pole tekstowe zczytana wartość zostanie pominięta
+  //Dla aplikacji ważne jest aby odczytywać wszystkie skany, dlatego stale aktywuje ona niewidzialne dla użytkownika
+  //pole input gdzie obsługiwane jest poźniej.
+  //Autofocusowanie się na obiekcie html-input, który pobiera dane ze szczytywanego kodu na skanerze
   @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
   focusOnScanner(){
     setTimeout(() => {
-      this.scanInput.nativeElement.setAttribute('readonly', 'readonly');
+      this.scanInput.nativeElement.setAttribute('readonly', 'readonly'); //nadanie atrybutu readonly uniemożliwi wyświetlenie się na urządzeniach android klawiatury
       this.scanInput.nativeElement.focus();
       setTimeout(() => {
-        this.scanInput.nativeElement.removeAttribute('readonly', 'readonly');
+        this.scanInput.nativeElement.removeAttribute('readonly', 'readonly'); //skoro jesteśmy już sfokusowani na tym polu usuwamy readonly, żeby móc wprowadzać wartości
       }, 50);
     }, 50
     )
   }
 
+  //Po odczytaniu danych ze skanera należy obsłużyć zczytaną wartość. Zostaje ona wprowadzona do zmiennej scanner.
+  //Menu logowania: dla wartości większych niż 7 znaków zostanie ona umieszczona w polu 'Pracownik'
+  //w innym przypadku będzie to pole 'Stanowisko'
+  scannerChange(): void {
+    if(this.scanner.length > 7){
+      this.userId = this.scanner;
+      this.serviceMethod.getUsers(this.userId);
+      this.scanner = '';
+    } else {
+      this.entityId = this.scanner;
+      this.serviceMethod.getEntity(this.entityId);
+      this.scanner = '';
+    }
+  }
+
+//ngOnInit - uruchamiana jest gdy widok zostaje zainicjowany. (tj. pokazany na ekranie za każdym razem)
   ngOnInit(): void {
 
+    //Focus na niewidoczny input
     this.focusOnScanner();
-    //Uruchomienie LanguageServisu
-    this.language = this.dataService.getLanguageFirstTime();
 
+    //Pobranie tekstów które są tłumaczone na różne języki
+    this.language = this.dataService.getLanguageFirstTime();
     this.dictionaryChangeLanguage();
     this.dataService.getLanguage().subscribe((data) => {
       this.language = data;
@@ -140,40 +120,31 @@ export class LoginAppComponent implements OnInit {
 
     //Uruchomienie Webserwisu - nasłuchiwanie odpowiedz zwrotnej
     this.serviceService.getResult().subscribe((data) => {
+
       if (!this.islogin){
       this.wynik = data;
+      this.soapOpeartion = this.serviceService.getSoapOperation();
 
-
-      //Gdy odpowiedź nadejdzie w zależności od operacji i jej wyniku dokonaj formatowania
+      //Gdy odpowiedź nadejdzie w zależności od operacji i jej wyniku wyknane zostaną odpowiednie działania
       switch (this.soapOpeartion) {
         case 'ValidateUser': {
           if (this.wynik.childNodes[0].nodeValue === 'true') {
-            this.spanUserClass = 'input-group-prepend ok';
-            this.dataService.setUserName(this.userId); //Wysyłanie userId do zmiennej globalnej
-            this.alertType = 1;
+            this.spanUserClass = 'input-group-prepend ok'; //Zmiana koloru inputu na zielony
+            this.dataService.setUserName(this.userId); //Wysyłanie userId do zmiennej globalnej, aby móc odczytać ją w każdym widoku
             this.alertMessage = this.Message1;
+            this.alertType = 1;
           } else {
-            this.spanUserClass = 'input-group-prepend nok';
-            this.alertType = 2;
+            this.spanUserClass = 'input-group-prepend nok'; //Zmiana koloru inputu na czerwony
             this.alertMessage = this.Message2;
-          }
-          break;
-        }
-
-        case 'GetUserResult': {
-          if (this.wynik != 'false') {
-
-            this.userPcs =this.wynik.getElementsByTagName('Worker_pcs')[0].childNodes[0].nodeValue
-            this.dataService.setUserPcs(this.userPcs);
-            this.userProcess =this.wynik.getElementsByTagName('Worker_process')[0].childNodes[0].nodeValue
-            this.dataService.setUserProcess(this.userProcess);
-            console.log(this.userPcs);
+            this.alertType = 2;
           }
           break;
         }
 
         case 'GetEntAndParentNameById': {
-          if (this.wynik != 'false') {
+
+            if (this.wynik != 'false') {
+
             try{
               this.entName =this.wynik.getElementsByTagName('Entity_name')[0].childNodes[0].nodeValue;
               this.dataService.setEntName(this.entName);
@@ -210,22 +181,23 @@ export class LoginAppComponent implements OnInit {
               this.dataService.setAllowStaticLocation(this.Allow_static_location);
             }catch(err){};
 
-              this.alertType = 1;
-              this.alertMessage = this.entName;
-              this.spanEntClass = 'input-group-prepend ok';
-              this.getChildren();
+            this.spanEntClass = 'input-group-prepend ok';  //Zmiana koloru inputu na zielony
+            this.alertType = 1;
+            this.alertMessage = this.entName;
+
+            this.serviceMethod.getChildren(this.entityId);
 
               break;
           } else {
-              this.alertType = 2;
-              this.alertMessage = this.Message3;
-              this.spanEntClass = 'input-group-prepend nok';
-              break;
+            this.spanEntClass = 'input-group-prepend nok';
+            this.alertType = 2;
+            this.alertMessage = this.Message3;
+            break;
           }
         }
+
         case 'GetChildEntities': {
          this.entHasChildren = this.wynik.childNodes[1].hasChildNodes();
-
         }
       }
 
@@ -235,40 +207,15 @@ export class LoginAppComponent implements OnInit {
         this.spanEntClass == 'input-group-prepend ok' &&
         this.spanUserClass == 'input-group-prepend ok'
       ) {
-
         this.islogin = true;
         this.isLogin.emit(2);
-
+        }
       }
-    }
     });
   }
-
-  //Obsługa webserwisów
-  getUsers(): any {
-    this.soapOpeartion = `ValidateUser`;
-    const soapParameters = `<userId>` + this.userId + `</userId>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
-  getUserData(): any {
-    this.soapOpeartion = `GetUserResult`;
-    const soapParameters = `<entityId>` + this.entityId + `</entityId>
-                            <worker>` + this.userId + `</worker>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
-  getEntity(): any {
-    this.soapOpeartion = `GetEntAndParentNameById`;
-    const soapParameters = `<entId>` + this.entityId + `</entId>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
-  getChildren(): any {
-    this.soapOpeartion = `GetChildEntities`;
-    const soapParameters = `<entId>` + this.entityId + `</entId>`;
-    this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
-  }
-
-
+  // downloadFile(data) {
+  //   const blob = new Blob([data], { type: 'text/xml' });
+  //   const url= window.URL.createObjectURL(blob);
+  //   window.open(url);
+  // }
 }

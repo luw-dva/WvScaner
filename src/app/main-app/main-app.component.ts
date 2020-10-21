@@ -1,7 +1,8 @@
+import { ServiceService } from '../service.service';
+import { ServiceMethod } from '../service.method';
 import { DataService } from './../data.service';
 import { dict } from './../dictionary';
 import { Component, OnInit, Output, EventEmitter, ElementRef, ViewChild } from '@angular/core';
-import { ServiceService } from '../service.service';
 import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
@@ -9,12 +10,14 @@ import { faPowerOff } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './main-app.component.html',
   styleUrls: ['./main-app.component.css'],
 })
+
 export class MainAppComponent implements OnInit {
   constructor(
     private serviceService: ServiceService,
     private dataService: DataService
   ) {}
 
+//--------DEKLARACJA ZMIENNYCH------
   //Icons
   faPowerOff = faPowerOff;
 
@@ -23,12 +26,12 @@ export class MainAppComponent implements OnInit {
   isLogin = new EventEmitter<number>();
 
   //Deklaracja zmiennych
+  serviceMethod = new ServiceMethod(this.serviceService);
   userName: string;
   entities: string;
   entId: string;
   scanner: string;
   entitiesParent: string;
-  barCodeResult: string;
   soapOpeartion: string;
   scannedQty: string = '0';
   scannedPT: string = '0';
@@ -61,6 +64,21 @@ export class MainAppComponent implements OnInit {
   blockResult: Array<{ item: string; message: string; pos: string; qConfirm}> = [];
   parser = new DOMParser();
 
+//------TŁUMACZENIA-------
+  dictionaryChangeLanguage() {
+    this.txtNoBlocks = dict.get('NoLocks')[this.language];
+    this.txtWorker = dict.get('Worker')[this.language];
+    this.txtWorkcenter = dict.get('Workcenter')[this.language];
+    this.txtPosition = dict.get('Position')[this.language];
+    this.txtQty = dict.get('Qty')[this.language];
+    this.txtResult = dict.get('Result')[this.language];
+    this.txtItems = dict.get('Items')[this.language];
+    this.txtBlocks = dict.get('Blocks')[this.language];
+    this.txtLocation = dict.get('StaticLocation')[this.language];
+    this.txtScanner = dict.get('Scanner')[this.language];
+  }
+
+//-----INPUT DLA SKANERA-----
   @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
   focusOnScanner(){
     setTimeout(() => {
@@ -73,12 +91,51 @@ export class MainAppComponent implements OnInit {
     )
   }
 
+  scannerChange(): void {
+    if (this.isItemActive) {
+      this.serviceMethod.getLocksSpecialItemsByWo(this.scanner, this.entId);
+      this.scanner = '';
+    }
+
+    if (this.isLocksActive) {
+      this.dataService.setBlockJust2Check(true);
+      this.serviceMethod.getActiveLocksByWoOperation(this.scanner, this.entitiesParent);
+      this.scanner = '';
+    }
+
+    if (!this.isItemActive && !this.isLocksActive){
+      this.dataService.setWo(this.scanner);
+      this.dataService.setBlockJust2Check(false);
+      this.serviceMethod.getActiveLocksByWoOperation(this.scanner, this.entitiesParent);
+
+    }
+  }
+
+//------ngOnINIT----
   ngOnInit(): void {
     this.focusOnScanner();
+
+    //Uruchomienie tłumaczeń
+    this.language = this.dataService.getLanguageFirstTime();
+    this.dictionaryChangeLanguage();
+    this.dataService.getLanguage().subscribe((data) => {
+      this.language = data;
+      this.dictionaryChangeLanguage();
+    });
+
+    this.userName = this.dataService.getUserName();
+    this.entities = this.dataService.getEntName();
+    this.entId = this.dataService.getEntId();
+    this.entitiesParent = this.dataService.getEntParentName();
+    this.serviceMethod.getUserData(this.entId, this.userName);
+
+    //Funckje dla webservice'u
     this.serviceService.getResult().subscribe((data: any) => {
       this.wynik = data;
+      this.soapOpeartion = this.serviceService.getSoapOperation();
 
       if (this.soapOpeartion === 'GetLocksSpecialItemsByWo') {
+        try{
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
           for (
             let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
@@ -90,7 +147,13 @@ export class MainAppComponent implements OnInit {
           this.isSpecialItem = true;
         }
         this.soapOpeartion = ''
-      }
+      }catch(err){
+          this.alertType = 1;
+          this.alertMessage = 'Brak specjalnych itemów';
+          setTimeout(() => {
+            this.alertType = 0;
+          }, 2000);
+      }}
 
      if(this.soapOpeartion == 'GetUserResult'){
         if (this.wynik != 'false') {
@@ -105,10 +168,8 @@ export class MainAppComponent implements OnInit {
         this.soapOpeartion = ''
       }
 
-
       if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
         if (this.wynik.childNodes[1].hasChildNodes()){
-          this.dataService.setLockWoData(this.wynik);
           let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
           if (xmlDoc.getElementsByTagName('Locks').length) {
             for (let i = 0; i < xmlDoc.getElementsByTagName('Locks')[0].childNodes.length; i++) {
@@ -138,6 +199,7 @@ export class MainAppComponent implements OnInit {
               this.blockResult[i] = { item: items, message: messages, pos: poss, qConfirm: qConf };
               }
           }
+          this.dataService.setLockWoData(this.wynik);
           this.isBlocks = true;
           this.dataService.setBlocks(this.blockResult);
         }
@@ -153,108 +215,20 @@ export class MainAppComponent implements OnInit {
           this.alertType = 0;
         }, 2000);
       }else{
-        this.confirmOperation();
+        this.serviceMethod.confirmOperation(this.entId, this.scanner, this.entitiesParent, this.userName);
       }
     }
+       this.scanner = '';
       this.soapOpeartion = ''
       }
 
     });
 
-
-    this.language = this.dataService.getLanguageFirstTime();
-    this.dictionaryChangeLanguage();
-    this.dataService.getLanguage().subscribe((data) => {
-      this.language = data;
-      this.dictionaryChangeLanguage();
-    });
-
-    this.userName = this.dataService.getUserName();
-    this.entities = this.dataService.getEntName();
-    this.entId = this.dataService.getEntId();
-    this.entitiesParent = this.dataService.getEntParentName();
-    this.getUserData();
-  }
-
-  dictionaryChangeLanguage() {
-    this.txtNoBlocks = dict.get('NoLocks')[this.language];
-    this.txtWorker = dict.get('Worker')[this.language];
-    this.txtWorkcenter = dict.get('Workcenter')[this.language];
-    this.txtPosition = dict.get('Position')[this.language];
-    this.txtQty = dict.get('Qty')[this.language];
-    this.txtResult = dict.get('Result')[this.language];
-    this.txtItems = dict.get('Items')[this.language];
-    this.txtBlocks = dict.get('Blocks')[this.language];
-    this.txtLocation = dict.get('StaticLocation')[this.language];
-    this.txtScanner = dict.get('Scanner')[this.language];
-  }
-
-  scannerChange(): void {
-    if (this.isItemActive) {
-      this.getGetLocksSpecialItemsByWo();
-      this.scanner = '';
-    }
-
-    if (this.isLocksActive) {
-      this.dataService.setBlockJust2Check(true);
-      this.getActiveLocksByWoOperation();
-      this.scanner = '';
-    }
-
-    if (!this.isItemActive && !this.isLocksActive){
-      this.dataService.setWo(this.scanner);
-      this.dataService.setBlockJust2Check(false);
-      this.getActiveLocksByWoOperation();
-      this.scanner = '';
-    }
   }
 
 
-  //Webserwis - obsluga wydarzenia
-  getGetLocksSpecialItemsByWo(): any {
-    this.soapOpeartion = `GetLocksSpecialItemsByWo`;
-    const soapParameters =
-      `<woId>` + this.scanner + `</woId>` +
-      `<entityId>` + this.entId + `</entityId>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
 
-  confirmOperation(): any {
-    this.soapOpeartion = `ConfirmOperation`;
-    const soapParameters =
-      `<entityId>` +  this.entId +  `</entityId>` +
-      `<woId>` + this.barCodeResult + `</woId>` +
-      `<operId>` + this.entitiesParent + `</operId>` +
-      `<worker>` +this.userName + `</worker>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
-  confirmBundle(): any {
-    this.soapOpeartion = `ConfirmBundle`;
-    const soapParameters =
-      `<entityId>` +  this.entId +  `</entityId>` +
-      `<bundle>` + this.scanner + `</bundle>` +
-      `<operId>` + this.entitiesParent + `</operId>` +
-      `<worker>` +this.userName + `</worker>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
-  getActiveLocksByWoOperation(): any {
-    this.soapOpeartion = `GetActiveLocksByWoOperation`;
-    const soapParameters =
-      `<wo>` + this.scanner + `</wo>` +
-      `<operation>` + this.entitiesParent + `</operation>`;
-    this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
-  }
-
-  getUserData(): any {
-    this.soapOpeartion = `GetUserResult`;
-    const soapParameters =
-      `<entityId>` + this.entId + `</entityId>
-      <worker>` + this.userName + `</worker>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-  }
-
+//-------FUNCKJE DODATKOWE-------
   logout(): void {
     this.isLogin.emit(1);
   }
@@ -271,8 +245,8 @@ export class MainAppComponent implements OnInit {
       this.locksButtonClass = 'btn btn-warning';
     }
   }
-  activeLocks() {
 
+  activeLocks() {
     this.isLocksActive = !this.isLocksActive;
     this.isItemActive = false;
 
@@ -283,7 +257,6 @@ export class MainAppComponent implements OnInit {
       this.locksButtonClass = 'btn btn-warning';
       this.itemButtonClass = 'btn btn-warning';
     }
-
   }
 
   closeSpecialItemWindow(res: boolean) {

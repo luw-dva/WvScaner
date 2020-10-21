@@ -1,10 +1,11 @@
+import { DataService } from './data.service';
 import { Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class ServiceService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,  private dataService: DataService) {}
   private WSDL =
     'http://dkvdc-wmes0001/MESServices/MESConfirmOperation.asmx?WSDL';
   private WSDLgs =
@@ -13,8 +14,11 @@ export class ServiceService {
     'http://dkvdc-wmes0001/MESServices/UserServices.asmx?WSDL';
   private WSDLqs =
     'http://dkvdc-wmes0001/MESServices/QualityLockServices.asmx?WSDL';
+
   private responseSOAP: any;
   private result = new Subject<string>();
+
+  operation: string;
 
   soapCall(operation: string, parameters: string): void {
     this.soapStructure(operation, parameters, this.WSDL);
@@ -33,6 +37,7 @@ export class ServiceService {
   }
 
   soapStructure(operation: string, parameters: string, WSDL: string){
+    this.operation = operation;
     this.responseSOAP = '';
     const xmlhttp = new XMLHttpRequest();
     const sr =
@@ -44,6 +49,8 @@ export class ServiceService {
       `</` + operation + `>
       </soap12:Body>
       </soap12:Envelope>`;
+
+
       console.log(parameters);
       xmlhttp.onreadystatechange = () => {
 
@@ -51,8 +58,10 @@ export class ServiceService {
           if (xmlhttp.status == 200) {
             console.log(xmlhttp.getAllResponseHeaders());
             const xml = xmlhttp.responseXML;
+
+            this.dataService.setXml(xml);
             this.responseSOAP = this.responseSOAP = xml.getElementsByTagName(operation + 'Result')[0];
-          } else if (xmlhttp.status == 500) {
+          } else {
             this.responseSOAP = 'false';
           }
           console.log(operation);
@@ -61,15 +70,19 @@ export class ServiceService {
           this.responseSOAP = '';
         }
       };
+
     // Send the POST request.
     xmlhttp.open('POST', WSDL, true);
     xmlhttp.setRequestHeader('Content-Type', 'text/xml');
-    xmlhttp.responseType = 'document';
-    xmlhttp.withCredentials = false;
     xmlhttp.send(sr);
+
     }
 
   getResult(): Observable<string> {
     return this.result.asObservable();
+  }
+
+  getSoapOperation(){
+    return this.operation;
   }
 }

@@ -2,6 +2,7 @@ import { DataService } from './../data.service';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
+
 import { faUserLock, faKey, faArrowAltCircleLeft, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
 import { XmlParser } from '@angular/compiler';
 
@@ -75,9 +76,11 @@ export class BlocksComponent implements OnInit {
 
     this.serviceService.getResult().subscribe((data) => {
       this.wynik = data;
+      this.soapOpeartion = this.serviceService.getSoapOperation();
 
       switch (this.soapOpeartion) {
         case 'Login': {
+          try{
           if(!this.wynik.childNodes[1].hasChildNodes()){
             this.spanUserClass = 'input-group-prepend nok';
             this.spanPinClass = 'input-group-prepend nok';
@@ -87,9 +90,9 @@ export class BlocksComponent implements OnInit {
             this.btnClass = 'btn btn-warning'
           }
           break;
-        }
-        case 'DeactivateLocks': {
-
+        }catch(err){}}
+        case 'DeactivateLocks2': {
+          break;
         }
       }
     });
@@ -141,10 +144,6 @@ export class BlocksComponent implements OnInit {
       this.isBlock2Check = true;
       this.isBlock2Check2 = true;
     }
-
-    console.log(this.isBlock2Check + " " + this.isBlock2Check2)
-
-
   }
 
 
@@ -202,12 +201,18 @@ export class BlocksComponent implements OnInit {
 
   getDeactivateLocks(): any {
     let xml_doc = new DOMParser;
-    let xml_doc2 = new DOMParser;
+    this.soapOpeartion = `DeactivateLocks2`;
+    let serial = new XMLSerializer
 
 
-    this.soapOpeartion = `DeactivateLocks`;
-    const soapParameters = `<jobs>` + xml_doc2.parseFromString(this.dataService.getLockWoData().childNodes[0], 'text/xml') + `</jobs><userData>` +
-                          xml_doc.parseFromString(`<UserData><UserId>` + this.qualityNumer +`</UserId></UserData>` + `</userData>`, 'text/xml');
+    const soapParameters =
+    `<jobs>` +
+    xml_doc.parseFromString(serial.serializeToString(this.dataService.getLockWoData()), 'text/xml') +
+    `</jobs>
+    <userData>` +
+    xml_doc.parseFromString(`<UserData><UserId>` + this.qualityNumer +`</UserId></UserData>`, 'text/xml') +
+    `</userData>`;
+
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
 }

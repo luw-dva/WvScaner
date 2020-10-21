@@ -15,15 +15,13 @@
           <div [ngClass]="spanUserClass">
             <span class="input-group-text"><i><fa-icon [icon]="faUser"></fa-icon></i></span>
           </div>
-          <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId"
-            (blur)="getUsers()" (focus)="getFocusedInputName('userInput')" disabled>
+          <input type="text" class="form-control" id='userInput' placeholder={{Input_worker}} [(ngModel)]="userId" disabled>
         </div>
         <div class="input-group form-group">
           <div [ngClass]="spanEntClass">
             <span class="input-group-text"><fa-icon [icon]="faIndustry"></fa-icon></span>
           </div>
-          <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId"
-            (blur)="getEntity()" (focus)="getFocusedInputName('entInput')" disabled>
+          <input type="text" class="form-control" id='entInput' placeholder={{Input_position}} [(ngModel)]="entityId" disabled>
         </div>
       </div>
     </div>
