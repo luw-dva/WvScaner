@@ -164,7 +164,7 @@ export class BlocksComponent implements OnInit {
   DeactivateWoLocks(){
     if (this.btnClass == 'btn btn-warning'){
     this.getDeactivateLocks();
-  //  this.confirmOperation();
+    this.confirmOperation();
     }
   }
 
@@ -200,19 +200,23 @@ export class BlocksComponent implements OnInit {
   }
 
   getDeactivateLocks(): any {
-    let xml_doc = new DOMParser;
-    this.soapOpeartion = `DeactivateLocks2`;
+    this.soapOpeartion = `DeactivateLocksText`;
     let serial = new XMLSerializer
+    let X: string;
+    let Y: string;
 
+    X = serial.serializeToString(this.dataService.getLockWoData());
+    Y =  `<?xml version="1.0" encoding="UTF-8"?><UserData><UserId>` + this.qualityNumer +`</UserId></UserData>`;
 
     const soapParameters =
     `<jobs>` +
-    xml_doc.parseFromString(serial.serializeToString(this.dataService.getLockWoData()), 'text/xml') +
+        escape(X) +
     `</jobs>
     <userData>` +
-    xml_doc.parseFromString(`<UserData><UserId>` + this.qualityNumer +`</UserId></UserData>`, 'text/xml') +
+        escape(Y) +
     `</userData>`;
 
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
+
 }

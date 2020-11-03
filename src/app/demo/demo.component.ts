@@ -40,7 +40,6 @@ export class DemoComponent implements AfterViewInit {
     }
 
     onStarted(started){
-      console.log(started);
       this.barecodeScanner.start();
     }
 

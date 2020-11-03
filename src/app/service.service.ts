@@ -50,13 +50,12 @@ export class ServiceService {
       </soap12:Body>
       </soap12:Envelope>`;
 
-
+      console.log(operation);
       console.log(parameters);
       xmlhttp.onreadystatechange = () => {
 
         if (xmlhttp.readyState == 4) {
           if (xmlhttp.status == 200) {
-            console.log(xmlhttp.getAllResponseHeaders());
             const xml = xmlhttp.responseXML;
 
             this.dataService.setXml(xml);
@@ -64,7 +63,7 @@ export class ServiceService {
           } else {
             this.responseSOAP = 'false';
           }
-          console.log(operation);
+
           console.log(this.responseSOAP);
           this.result.next(this.responseSOAP);
           this.responseSOAP = '';
@@ -75,7 +74,6 @@ export class ServiceService {
     xmlhttp.open('POST', WSDL, true);
     xmlhttp.setRequestHeader('Content-Type', 'text/xml');
     xmlhttp.send(sr);
-
     }
 
   getResult(): Observable<string> {

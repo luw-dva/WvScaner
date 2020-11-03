@@ -98,15 +98,16 @@ export class LoginAppComponent implements OnInit {
       this.serviceMethod.getUsers(this.userId);
       this.scanner = '';
     } else {
-      this.entityId = this.scanner;
+      this.entityId = this.scanner.substring(3); // Kody kreskowe wygladają następująco 'ENT???' zczytujemy tylko liczby '?' więc substring(3)
       this.serviceMethod.getEntity(this.entityId);
       this.scanner = '';
     }
   }
 
+
+
 //ngOnInit - uruchamiana jest gdy widok zostaje zainicjowany. (tj. pokazany na ekranie za każdym razem)
   ngOnInit(): void {
-
     //Focus na niewidoczny input
     this.focusOnScanner();
 
@@ -213,9 +214,5 @@ export class LoginAppComponent implements OnInit {
       }
     });
   }
-  // downloadFile(data) {
-  //   const blob = new Blob([data], { type: 'text/xml' });
-  //   const url= window.URL.createObjectURL(blob);
-  //   window.open(url);
-  // }
+
 }

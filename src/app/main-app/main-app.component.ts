@@ -192,7 +192,6 @@ export class MainAppComponent implements OnInit {
 
               try{
                 qConf = xmlDoc.getElementsByTagName('Lock')[i].getAttributeNode("unlockable").value;
-                console.log(qConf);
               }catch(err){};
 
               if(items.length + messages.length + poss.length > 5 ){
