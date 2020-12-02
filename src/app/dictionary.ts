@@ -17,3 +17,4 @@ dict.set("qualityWorkerNumber", ["Numer jakoścowca", "Quality Controler number"
 dict.set("confirmButton", ["Potwierdź", "Confirm", "Patvirtinti"]);
 dict.set("back", ["Wróc", "Back", "Grįžk"]);
 dict.set("NoLocks", ["Brak blokad", "No locks", "Jokių užsikimšimų"]);
+dict.set("NoSpecItem", ["Brak specjalnych itemow", "No special items", "Jokių užsikimšimų"]);

@@ -1,4 +1,3 @@
-import { XmlParser } from '@angular/compiler';
 import { ServiceService } from './../service.service';
 import { ServiceMethod } from './../service.method';
 import { DataService } from './../data.service';
@@ -14,7 +13,7 @@ import { faIndustry, faUser, faQrcode } from '@fortawesome/free-solid-svg-icons'
 
 export class LoginAppComponent implements OnInit {
   constructor(
-    private serviceService: ServiceService,
+    private serviceServiceLog: ServiceService,
     private dataService: DataService
   ) {}
 
@@ -23,13 +22,14 @@ export class LoginAppComponent implements OnInit {
   faIndustry = faIndustry;
   faUser = faUser;
   faQrcode = faQrcode;
-  serviceMethod = new ServiceMethod(this.serviceService);
+  serviceMethod = new ServiceMethod(this.serviceServiceLog);
 
   //Emitery// Bindowanie danych logowania
   @Output()
   isLogin = new EventEmitter<number>();
 
   //Deklaracja zmiennych standardowych
+  private sub: any;
   userId: string;
   language: number;
   entityId: string;
@@ -77,7 +77,7 @@ export class LoginAppComponent implements OnInit {
   //Dla aplikacji ważne jest aby odczytywać wszystkie skany, dlatego stale aktywuje ona niewidzialne dla użytkownika
   //pole input gdzie obsługiwane jest poźniej.
   //Autofocusowanie się na obiekcie html-input, który pobiera dane ze szczytywanego kodu na skanerze
-  @ViewChild('scanInput', {static: false}) scanInput:ElementRef;
+  @ViewChild('scanInput') scanInput:ElementRef;
   focusOnScanner(){
     setTimeout(() => {
       this.scanInput.nativeElement.setAttribute('readonly', 'readonly'); //nadanie atrybutu readonly uniemożliwi wyświetlenie się na urządzeniach android klawiatury
@@ -120,11 +120,11 @@ export class LoginAppComponent implements OnInit {
     });
 
     //Uruchomienie Webserwisu - nasłuchiwanie odpowiedz zwrotnej
-    this.serviceService.getResult().subscribe((data) => {
+    this.sub = this.serviceServiceLog.getResult().subscribe((data) => {
 
       if (!this.islogin){
       this.wynik = data;
-      this.soapOpeartion = this.serviceService.getSoapOperation();
+      this.soapOpeartion = this.serviceServiceLog.getSoapOperation();
 
       //Gdy odpowiedź nadejdzie w zależności od operacji i jej wyniku wyknane zostaną odpowiednie działania
       switch (this.soapOpeartion) {
@@ -213,6 +213,10 @@ export class LoginAppComponent implements OnInit {
         }
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 
 }

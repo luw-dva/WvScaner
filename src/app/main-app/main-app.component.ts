@@ -26,6 +26,7 @@ export class MainAppComponent implements OnInit {
   isLogin = new EventEmitter<number>();
 
   //Deklaracja zmiennych
+  private sub: any;
   serviceMethod = new ServiceMethod(this.serviceService);
   userName: string;
   entities: string;
@@ -58,6 +59,7 @@ export class MainAppComponent implements OnInit {
   txtItems: string;
   txtBlocks: string;
   txtNoBlocks: string;
+  txtNoSpecItem: string;
   txtWorkcenter: string;
   txtLocation: string;
   itemsResult: Array<{ item: string; message: string }> = [];
@@ -66,6 +68,7 @@ export class MainAppComponent implements OnInit {
 
 //------TŁUMACZENIA-------
   dictionaryChangeLanguage() {
+    this.txtNoSpecItem = dict.get('NoSpecItem')[this.language]
     this.txtNoBlocks = dict.get('NoLocks')[this.language];
     this.txtWorker = dict.get('Worker')[this.language];
     this.txtWorkcenter = dict.get('Workcenter')[this.language];
@@ -93,21 +96,20 @@ export class MainAppComponent implements OnInit {
 
   scannerChange(): void {
     if (this.isItemActive) {
-      this.serviceMethod.getLocksSpecialItemsByWo(this.scanner, this.entId);
+      this.serviceMethod.getLocksSpecialItemsById(this.scanner, this.entId);
       this.scanner = '';
     }
 
     if (this.isLocksActive) {
       this.dataService.setBlockJust2Check(true);
-      this.serviceMethod.getActiveLocksByWoOperation(this.scanner, this.entitiesParent);
+      this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
       this.scanner = '';
     }
 
     if (!this.isItemActive && !this.isLocksActive){
       this.dataService.setWo(this.scanner);
       this.dataService.setBlockJust2Check(false);
-      this.serviceMethod.getActiveLocksByWoOperation(this.scanner, this.entitiesParent);
-
+      this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
     }
   }
 
@@ -130,16 +132,27 @@ export class MainAppComponent implements OnInit {
     this.serviceMethod.getUserData(this.entId, this.userName);
 
     //Funckje dla webservice'u
-    this.serviceService.getResult().subscribe((data: any) => {
+    this.sub = this.serviceService.getResult().subscribe((data: any) => {
       this.wynik = data;
       this.soapOpeartion = this.serviceService.getSoapOperation();
 
-      if (this.soapOpeartion === 'GetLocksSpecialItemsByWo') {
+      if (this.soapOpeartion == 'ConfirmBackground') {
+        if (data !=false){
+        this.userPcs =this.wynik.getElementsByTagName('Worker_pcs')[0].childNodes[0].nodeValue
+        this.dataService.setUserPcs(this.userPcs);
+        this.userProcess =this.wynik.getElementsByTagName('Worker_process')[0].childNodes[0].nodeValue
+        this.dataService.setUserProcess(this.userProcess);
+        this.scannedPT = this.dataService.getUserProcess();
+        this.scannedQty = this.dataService.getUserPcs();
+      }
+      this.soapOpeartion = '';
+    }
+
+      if (this.soapOpeartion == 'GetLocksSpecialItemsById') {
         try{
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
           for (
             let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
-
             this.itemsResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
               message: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('message')[0].childNodes[0].nodeValue,
             };
@@ -148,11 +161,13 @@ export class MainAppComponent implements OnInit {
         }
         this.soapOpeartion = ''
       }catch(err){
+          if(this.isItemActive){
           this.alertType = 1;
-          this.alertMessage = 'Brak specjalnych itemów';
+          this.alertMessage = this.txtNoSpecItem;
           setTimeout(() => {
             this.alertType = 0;
           }, 2000);
+        }
       }}
 
      if(this.soapOpeartion == 'GetUserResult'){
@@ -163,12 +178,11 @@ export class MainAppComponent implements OnInit {
           this.dataService.setUserProcess(this.userProcess);
           this.scannedPT = this.dataService.getUserProcess();
           this.scannedQty = this.dataService.getUserPcs();
-
         }
         this.soapOpeartion = ''
       }
 
-      if(this.soapOpeartion == 'GetActiveLocksByWoOperation'){
+      if(this.soapOpeartion == 'GetActiveLocksByIdOperation'){
         if (this.wynik.childNodes[1].hasChildNodes()){
           let xmlDoc = this.parser.parseFromString(this.wynik.getElementsByTagName('q_LockDetails')[0].childNodes[0].nodeValue, "text/xml");
           if (xmlDoc.getElementsByTagName('Locks').length) {
@@ -204,7 +218,8 @@ export class MainAppComponent implements OnInit {
         }
 
         this.isLogin.emit(3);
-        this.soapOpeartion = ''
+        this.soapOpeartion = '';
+
       }else{
 
         if(this.isLocksActive){
@@ -214,22 +229,22 @@ export class MainAppComponent implements OnInit {
           this.alertType = 0;
         }, 2000);
       }else{
-        this.serviceMethod.confirmOperation(this.entId, this.scanner, this.entitiesParent, this.userName);
+        this.serviceMethod.confirmBackground(this.dataService.getWo(), this.entId, this.userName)
       }
     }
-       this.scanner = '';
+      this.scanner = '';
       this.soapOpeartion = ''
       }
 
     });
-
   }
-
-
 
 //-------FUNCKJE DODATKOWE-------
   logout(): void {
+    this.dataService.setUserName('');
+    this.sub.unsubscribe();
     this.isLogin.emit(1);
+    window.location.reload();
   }
 
   activeItem() {
@@ -261,5 +276,9 @@ export class MainAppComponent implements OnInit {
   closeSpecialItemWindow(res: boolean) {
     this.isSpecialItem = !res;
     this.itemsResult.length = 0;
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 }

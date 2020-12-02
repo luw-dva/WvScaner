@@ -28,30 +28,30 @@
               </tr>
             </table>
           </h3>
+          <div [ngSwitch]="alertType" style='position: absolute; margin-top: 10px;  left: 10px;
+          right: 10px;
+          margin-left: auto;
+          margin-right: auto;  z-index: 999; font-size: 18px;'>
+              <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 0;">
+              {{alertMessage}}
+            </div>
+            <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 0;">
+              {{alertMessage}}
+            </div>
+            <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 0;">
+              {{alertMessage}}
+            </div>
+          </div>
           <div>
-            <input #scanInput type='text' autofocus  style='opacity: 0' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
+            <input #scanInput type='text' autofocus  style='opacity: 0; height: 1px;' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
             <!-- <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo> -->
           </div>
         </div>
       </div>
-
-      <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
-      <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">{{txtBlocks}}</button>
-
-      <button [hidden]="!isStaticLocation" style="margin:2px; z-index: 99;" [ngClass]="staticLocationButtonClass">{{txtLocation}}</button>
-
-    </div>
-    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute; margin-top: 10px;' [childBLock]="itemsResult" ></app-itemsblock>
+        <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
+        <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">{{txtBlocks}}</button>
+        <button [hidden]="!isStaticLocation" style="margin:2px; z-index: 99;" [ngClass]="staticLocationButtonClass">{{txtLocation}}</button>
+      </div>
+    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute; margin-top: 10px;' [childBLock]="itemsResult"></app-itemsblock>
   </div>
-</div>
-<div [ngSwitch]="alertType">
-  <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
-  {{alertMessage}}
- </div>
- <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
-  {{alertMessage}}
- </div>
- <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 10px;">
-  {{alertMessage}}
-</div>
 </div>

@@ -1,18 +1,19 @@
 <div class="language">
- <span class="language_icon" (click)="changeLanguage()">{{languageName}}</span>
+  <span class="language_icon" (click)="changeLanguage()">{{languageName}}</span>
 </div>
-<!-- <input #scanInput  type='text' autofocus style='opacity: 0; height: 1;' [(ngModel)]="scanner" (change)="scannerChange()"> -->
 
-<div [ngSwitch]='viewNumber' style="position: relative;">
-  <ng-template ngSwitchCase=1>
-    <app-login-app (isLogin)='isLogin($event)'></app-login-app>
-  </ng-template>
-  <ng-template ngSwitchCase=2>
+<div  style="position: relative;">
+  <div *ngIf="viewNumber == 1">
+    <app-login-app (isLogin)='isLogin($event)' ></app-login-app>
+  </div>
+
+  <div *ngIf="viewNumber == 2">
     <app-main-app (isLogin)='isLogin($event)'></app-main-app>
-  </ng-template>
-  <ng-template ngSwitchCase=3>
+  </div>
+
+  <div *ngIf="viewNumber == 3">
     <app-blocks (isLogin)='isLogin($event)'></app-blocks>
-  </ng-template>
+  </div>
 </div>
 
 

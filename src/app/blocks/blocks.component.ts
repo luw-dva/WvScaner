@@ -1,3 +1,4 @@
+import { ServiceMethod } from './../service.method';
 import { DataService } from './../data.service';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { dict } from './../dictionary';
@@ -18,11 +19,12 @@ export class BlocksComponent implements OnInit {
   constructor(private serviceService: ServiceService,
     private dataService: DataService) { }
 
+  private sub: any;
   faUserLock = faUserLock;
   faKey = faKey;
   faArrowAltCircleLeft = faArrowAltCircleLeft;
   faArrowAltCircleRight = faArrowAltCircleRight;
-
+  serviceMethod = new ServiceMethod(this.serviceService);
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
   alertMessage: string = '';
   qualityNumer: string = '';
@@ -74,7 +76,7 @@ export class BlocksComponent implements OnInit {
       this.dictionaryChangeLanguage();
     });
 
-    this.serviceService.getResult().subscribe((data) => {
+    this.sub = this.serviceService.getResult().subscribe((data) => {
       this.wynik = data;
       this.soapOpeartion = this.serviceService.getSoapOperation();
 
@@ -135,9 +137,6 @@ export class BlocksComponent implements OnInit {
 
     if (this.isBlock2Check2 == true){
         this.btnClass = 'btn btn-warning'
-        this.alertType = 1
-        this.alertMessage = 'Potwierdzenie jakościowca nie jest wymagane'
-
     }
 
     if(this.dataService.getBlockJust2Check()){
@@ -164,7 +163,8 @@ export class BlocksComponent implements OnInit {
   DeactivateWoLocks(){
     if (this.btnClass == 'btn btn-warning'){
     this.getDeactivateLocks();
-    this.confirmOperation();
+    this.serviceMethod.confirmBackground(this.dataService.getWo(), this.dataService.getEntId(), this.dataService.getUserName())
+    this.goToMainView();
     }
   }
 
@@ -188,17 +188,6 @@ export class BlocksComponent implements OnInit {
     this.serviceService.soapGsCall(this.soapOpeartion, soapParameters);
   }
 
-    confirmOperation(): any {
-    this.soapOpeartion = `ConfirmOperation`;
-    const soapParameters =
-      `<entityId>` +  this.dataService.getEntId() +  `</entityId>` +
-      `<woId>` + this.dataService.getWo() + `</woId>` +
-      `<operId>` + this.dataService.getEntParentName() + `</operId>` +
-      `<worker>` +this.dataService.getUserName() + `</worker>`;
-    this.serviceService.soapCall(this.soapOpeartion, soapParameters);
-    this.dataService.setWo('');
-  }
-
   getDeactivateLocks(): any {
     this.soapOpeartion = `DeactivateLocksText`;
     let serial = new XMLSerializer
@@ -219,4 +208,7 @@ export class BlocksComponent implements OnInit {
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
   }
 
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
 }

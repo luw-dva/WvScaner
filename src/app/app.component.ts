@@ -13,7 +13,7 @@ export class AppComponent implements OnInit {
   i: number = 0;
 
   languageName: string = '[PL]';
-  viewNumber: number = 1;
+  viewNumber: number;
   scanner:string ;
 
   scannerChange(){
@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataService.setLanguage(0);
+    this.viewNumber = 1;
   }
 
   changeLanguage() {

@@ -28,10 +28,10 @@ export class ServiceMethod {
     this.serviceService.soapCall(soapOpeartion, soapParameters);
   }
 
-  getActiveLocksByWoOperation(wo: string, entParent: string): any {
-    const soapOpeartion = `GetActiveLocksByWoOperation`;
+  GetActiveLocksByIdOperation(wo: string, entParent: string): any {
+    const soapOpeartion = `GetActiveLocksByIdOperation`;
     const soapParameters =
-      `<wo>` + wo + `</wo>` +
+      `<id>` + wo + `</id>` +
       `<operation>` + entParent + `</operation>`;
     this.serviceService.soapQsCall(soapOpeartion, soapParameters);
   }
@@ -50,17 +50,30 @@ export class ServiceMethod {
     const soapOpeartion = `ConfirmOperation`;
     const soapParameters =
       `<entityId>` +  entId +  `</entityId>` +
-      `<woId>` + wo + 'DDDUUPA' + `</woId>` +
+      `<woId>` + wo  + `</woId>` +
       `<operId>` + entitiesParent + `</operId>` +
       `<worker>` + userName + `</worker>`;
     this.serviceService.soapCall(soapOpeartion, soapParameters);
   }
 
-  getLocksSpecialItemsByWo(wo: string , entId: string): any {
-    const soapOpeartion = `GetLocksSpecialItemsByWo`;
+  getLocksSpecialItemsById(wo: string , entId: string): any {
+    const soapOpeartion = `GetLocksSpecialItemsById`;
     const soapParameters =
-      `<woId>` + wo + `</woId>` +
+      `<id>` + wo + `</id>` +
       `<entityId>` + entId + `</entityId>`;
+    this.serviceService.soapCall(soapOpeartion, soapParameters);
+  }
+
+  confirmBackground(wo: string , entId: string, userId: string): any {
+    const soapOpeartion = `ConfirmBackground`;
+
+    let woArray: Array<string> = new Array;
+    woArray.push(wo)
+
+    const soapParameters =
+      `<entityId>` + entId + `</entityId>` +
+      `<userId>` + userId + `</userId>` +
+      `<keys>[` + woArray + `]</keys>`;
     this.serviceService.soapCall(soapOpeartion, soapParameters);
   }
 }

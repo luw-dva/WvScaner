@@ -1,11 +1,11 @@
 import { DataService } from './data.service';
 import { Observable, Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class ServiceService {
-  constructor(private http: HttpClient,  private dataService: DataService) {}
+  constructor(private dataService: DataService) {}
+
   private WSDL =
     'http://dkvdc-wmes0001/MESServices/MESConfirmOperation.asmx?WSDL';
   private WSDLgs =
@@ -81,6 +81,8 @@ export class ServiceService {
   }
 
   getSoapOperation(){
+
     return this.operation;
   }
+
 }
