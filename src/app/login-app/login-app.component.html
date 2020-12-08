@@ -46,4 +46,4 @@ style='opacity: 0; height:1px; width: 1px;'
 -->
 
 </div>
-<input #scanInput type='text' autofocus  style='opacity: 0' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">
+<input #scanInput type='text' autofocus  style='opacity: 0; z-index:-10' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">

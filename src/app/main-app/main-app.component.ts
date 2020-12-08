@@ -62,7 +62,7 @@ export class MainAppComponent implements OnInit {
   txtNoSpecItem: string;
   txtWorkcenter: string;
   txtLocation: string;
-  itemsResult: Array<{ item: string; message: string }> = [];
+  itemsResult: Array<{ item: string; message: string; rgb: string}> = [];
   blockResult: Array<{ item: string; message: string; pos: string; qConfirm}> = [];
   parser = new DOMParser();
 
@@ -153,8 +153,14 @@ export class MainAppComponent implements OnInit {
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
           for (
             let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
+              let rgb_ds = 'x';
+              try {
+                rgb_ds = this.wynik.getElementsByTagName('item')[i].getElementsByTagName('rgb')[0].childNodes[0].nodeValue;
+              } catch (error) {}
+
             this.itemsResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
               message: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('message')[0].childNodes[0].nodeValue,
+              rgb: rgb_ds
             };
           }
           this.isSpecialItem = true;
@@ -228,14 +234,13 @@ export class MainAppComponent implements OnInit {
         setTimeout(() => {
           this.alertType = 0;
         }, 2000);
-      }else{
-        this.serviceMethod.confirmBackground(this.dataService.getWo(), this.entId, this.userName)
+        }else{
+          this.serviceMethod.confirmBackground(this.dataService.getWo(), this.entId, this.userName)
+        }
       }
-    }
       this.scanner = '';
       this.soapOpeartion = ''
-      }
-
+    }
     });
   }
 

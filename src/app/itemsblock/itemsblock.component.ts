@@ -22,5 +22,4 @@ export class ItemsblockComponent implements OnInit {
   close(){
     this.closeEmiter.emit(true);
   }
-
 }

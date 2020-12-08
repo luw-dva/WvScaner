@@ -84,8 +84,8 @@ export class LoginAppComponent implements OnInit {
       this.scanInput.nativeElement.focus();
       setTimeout(() => {
         this.scanInput.nativeElement.removeAttribute('readonly', 'readonly'); //skoro jesteśmy już sfokusowani na tym polu usuwamy readonly, żeby móc wprowadzać wartości
-      }, 50);
-    }, 50
+      }, 100);
+    }, 100
     )
   }
 
@@ -93,6 +93,7 @@ export class LoginAppComponent implements OnInit {
   //Menu logowania: dla wartości większych niż 7 znaków zostanie ona umieszczona w polu 'Pracownik'
   //w innym przypadku będzie to pole 'Stanowisko'
   scannerChange(): void {
+
     if(this.scanner.length > 7){
       this.userId = this.scanner;
       this.serviceMethod.getUsers(this.userId);
@@ -213,6 +214,7 @@ export class LoginAppComponent implements OnInit {
         }
       }
     });
+
   }
 
   ngOnDestroy() {

@@ -68,7 +68,15 @@ export class ServiceMethod {
     const soapOpeartion = `ConfirmBackground`;
 
     let woArray: Array<string> = new Array;
-    woArray.push(wo)
+
+    if (wo.search('$')){
+      let woTab: Array<string> = wo.split('$')
+        woTab.forEach(element => {
+          woArray.push(element)
+        });
+    }else{
+      woArray.push(wo)
+    }
 
     const soapParameters =
       `<entityId>` + entId + `</entityId>` +

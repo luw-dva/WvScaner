@@ -5,3 +5,12 @@
   border-radius: 10px;
   color: whitesmoke;
 }
+
+.divRGB {
+  border: 2px solid #ffFFC312;
+  border-radius: 10px;
+  width: 80px;
+  height:80px;
+  margin: auto;
+}
+
