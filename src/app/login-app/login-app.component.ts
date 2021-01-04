@@ -24,12 +24,16 @@ export class LoginAppComponent implements OnInit {
   faQrcode = faQrcode;
   serviceMethod = new ServiceMethod(this.serviceServiceLog);
 
+
   //Emitery// Bindowanie danych logowania
   @Output()
   isLogin = new EventEmitter<number>();
+  @Output()
+  isLoader = new EventEmitter<boolean>();
 
   //Deklaracja zmiennych standardowych
   private sub: any;
+  loader: boolean = false;
   userId: string;
   language: number;
   entityId: string;
@@ -62,6 +66,7 @@ export class LoginAppComponent implements OnInit {
   Message1: string;
   Message2: string;
   Message3: string;
+
   dictionaryChangeLanguage() {
     this.Header_login = dict.get('Header_login')[this.language];
     this.Input_worker = dict.get('Worker')[this.language];
@@ -76,7 +81,7 @@ export class LoginAppComponent implements OnInit {
   //Jeśli aktywne nie jest żadne pole tekstowe zczytana wartość zostanie pominięta
   //Dla aplikacji ważne jest aby odczytywać wszystkie skany, dlatego stale aktywuje ona niewidzialne dla użytkownika
   //pole input gdzie obsługiwane jest poźniej.
-  //Autofocusowanie się na obiekcie html-input, który pobiera dane ze szczytywanego kodu na skanerze
+  //Autofocusowanie się na obiekcie html-input, który pobiera dane ze zczytywanego kodu na skanerze
   @ViewChild('scanInput') scanInput:ElementRef;
   focusOnScanner(){
     setTimeout(() => {
@@ -93,19 +98,20 @@ export class LoginAppComponent implements OnInit {
   //Menu logowania: dla wartości większych niż 7 znaków zostanie ona umieszczona w polu 'Pracownik'
   //w innym przypadku będzie to pole 'Stanowisko'
   scannerChange(): void {
-
-    if(this.scanner.length > 7){
-      this.userId = this.scanner;
-      this.serviceMethod.getUsers(this.userId);
-      this.scanner = '';
-    } else {
-      this.entityId = this.scanner.substring(3); // Kody kreskowe wygladają następująco 'ENT???' zczytujemy tylko liczby '?' więc substring(3)
-      this.serviceMethod.getEntity(this.entityId);
-      this.scanner = '';
+    if(!this.loader){
+      this.loader = true;
+      this.isLoader.emit(this.loader);
+      if(this.scanner.length > 7){
+        this.userId = this.scanner;
+        this.serviceMethod.getUsers(this.userId);
+        this.scanner = '';
+      } else {
+        this.entityId = this.scanner.substring(3); // Kody kreskowe wygladają następująco 'ENT???' zczytujemy tylko liczby '?' więc substring(3)
+        this.serviceMethod.getEntity(this.entityId);
+        this.scanner = '';
+      }
     }
   }
-
-
 
 //ngOnInit - uruchamiana jest gdy widok zostaje zainicjowany. (tj. pokazany na ekranie za każdym razem)
   ngOnInit(): void {
@@ -145,7 +151,7 @@ export class LoginAppComponent implements OnInit {
 
         case 'GetEntAndParentNameById': {
 
-            if (this.wynik != 'false') {
+          if (this.wynik != 'false') {
 
             try{
               this.entName =this.wynik.getElementsByTagName('Entity_name')[0].childNodes[0].nodeValue;
@@ -213,12 +219,12 @@ export class LoginAppComponent implements OnInit {
         this.isLogin.emit(2);
         }
       }
+      this.loader = false;
+      this.isLoader.emit(this.loader);
     });
-
   }
 
   ngOnDestroy() {
     this.sub.unsubscribe();
   }
-
 }

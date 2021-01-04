@@ -12,8 +12,14 @@ export class ItemsblockComponent implements OnInit {
   @Input()
   childBLock;
 
+  @Input()
+  isToConfirm:boolean = false; // DLA T4000140 -> zatwierdzanie koloru
+
   @Output()
   closeEmiter = new EventEmitter<boolean>();
+
+  @Output()
+  confirmEmiter = new EventEmitter<boolean>();
   closeWindow = false;
 
   ngOnInit(): void {
@@ -21,5 +27,10 @@ export class ItemsblockComponent implements OnInit {
 
   close(){
     this.closeEmiter.emit(true);
+  }
+
+  confirm(){
+    this.closeEmiter.emit(true);
+    this.confirmEmiter.emit(true);
   }
 }

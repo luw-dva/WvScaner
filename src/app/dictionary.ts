@@ -14,7 +14,8 @@ dict.set("StaticLocation", ["Ustaw stałą lokację", "Set static location", "Nu
 dict.set("Scanner", ["Skaner", "Scanner", "Skaitytuvas"]);
 dict.set("block_header", ["Blokady", "Blocks", "Blokados"]);
 dict.set("qualityWorkerNumber", ["Numer jakoścowca", "Quality Controler number", "Kokybiško darbuotojo numeris"]);
-dict.set("confirmButton", ["Potwierdź", "Confirm", "Patvirtinti"]);
+dict.set("confirmButton", ["Potwierdź zlecenie", "Confirm order", "Patvirtinti"]);
 dict.set("back", ["Wróc", "Back", "Grįžk"]);
 dict.set("NoLocks", ["Brak blokad", "No locks", "Jokių užsikimšimų"]);
 dict.set("NoSpecItem", ["Brak specjalnych itemow", "No special items", "Jokių užsikimšimų"]);
+dict.set("MsgSuccesfullyUnlocked", ["Odblokowano", "Unlocked", "Atrakinta"]);

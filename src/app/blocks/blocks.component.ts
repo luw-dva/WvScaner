@@ -3,9 +3,7 @@ import { DataService } from './../data.service';
 import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { dict } from './../dictionary';
 import { ServiceService } from './../service.service';
-
 import { faUserLock, faKey, faArrowAltCircleLeft, faArrowAltCircleRight } from '@fortawesome/free-solid-svg-icons';
-import { XmlParser } from '@angular/compiler';
 
 @Component({
   selector: 'app-blocks',
@@ -16,10 +14,15 @@ export class BlocksComponent implements OnInit {
 
   childBLock: Array<{ item: string; message: string; pos: string; qConfirm: string }>;
 
+  @Output()
+  isLoader = new EventEmitter<boolean>();
+
+
   constructor(private serviceService: ServiceService,
     private dataService: DataService) { }
 
   private sub: any;
+  loader: boolean = false;
   faUserLock = faUserLock;
   faKey = faKey;
   faArrowAltCircleLeft = faArrowAltCircleLeft;
@@ -32,7 +35,7 @@ export class BlocksComponent implements OnInit {
   scanner: string;
   isBlock2Check: boolean = false;
   isBlock2Check2: boolean = true;
-  childBLockElement: number = 0;
+  childBLockElement: number = 1;
   qualityPIN: string = '';
   wynik: any;
   qUserData:string;
@@ -56,12 +59,8 @@ export class BlocksComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.childBLock = this.dataService.getBlocks();
     this.hideElements();
-
-
-
     this.focusOnScanner();
 
     this.childBLock = this.dataService.getBlocks();
@@ -94,30 +93,37 @@ export class BlocksComponent implements OnInit {
           break;
         }catch(err){}}
         case 'DeactivateLocks2': {
+          this.goToMainView();
           break;
         }
       }
+      this.loader = false;
+      this.isLoader.emit(this.loader);
     });
   }
 
   scannerChange(): void {
-    if (this.scanner.length >4) {
-      this.qualityNumer = this.scanner;
-      this.scanner = '';
-    }else{
-      this.qualityPIN = this.scanner;
-      this.scanner = '';
-    }
-    if (this.qualityNumer.length != 0 && this.qualityPIN.length != 0){
-      this.getLogin();
+    if(!this.loader){
+        this.loader = true;
+        this.isLoader.emit(this.loader);
+      if (this.scanner.length >4) {
+        this.qualityNumer = this.scanner;
+        this.scanner = '';
+      }else{
+        this.qualityPIN = this.scanner;
+        this.scanner = '';
+      }
+      if (this.qualityNumer.length != 0 && this.qualityPIN.length != 0){
+        this.getLoginQuality();
+      }
     }
   }
 
   goLeft():void {
-    if (this.childBLockElement > 0){
+    if (this.childBLockElement > 1){
       this.childBLockElement--
       this.rightClass = 'btn btn-warning'
-      if (this.childBLockElement = 0) this.leftClass = 'btn btn-secondary';
+      if (this.childBLockElement == 1) this.leftClass = 'btn btn-secondary';
     }
   }
 
@@ -152,12 +158,14 @@ export class BlocksComponent implements OnInit {
   block_header: string;
   qualityWorkerNumber: string;
   confirmButton: string;
+  txtMsgSuccesfullyUnlocked: string;
 
   dictionaryChangeLanguage() {
     this.block_header = dict.get('block_header')[this.language];
     this.qualityWorkerNumber = dict.get('qualityWorkerNumber')[this.language];
     this.confirmButton = dict.get('confirmButton')[this.language];
     this.backButton = dict.get('back')[this.language];
+    this.txtMsgSuccesfullyUnlocked = dict.get('MsgSuccesfullyUnlocked')[this.language];
   }
 
   DeactivateWoLocks(){
@@ -181,7 +189,7 @@ export class BlocksComponent implements OnInit {
     this.dataService.setBlocks([]);
   }
 
-  getLogin(): any {
+  getLoginQuality(): any {
     this.soapOpeartion = `Login`;
     const soapParameters = `<userName>` + this.qualityNumer + `</userName>
                             <password>` + this.qualityPIN +`</password>`;
@@ -204,8 +212,13 @@ export class BlocksComponent implements OnInit {
     <userData>` +
         escape(Y) +
     `</userData>`;
-
     this.serviceService.soapQsCall(this.soapOpeartion, soapParameters);
+
+    this.alertType = 1;
+        this.alertMessage = this.txtMsgSuccesfullyUnlocked;
+        setTimeout(() => {
+          this.alertType = 0;
+        }, 2000);
   }
 
   ngOnDestroy() {

@@ -1,8 +1,0 @@
-
- <div [hidden]="!isCamActive">
-  <barcode-scanner-livestream type="code_39" (valueChanges)="onValueChanges($event)" (started)="(onStarted)"></barcode-scanner-livestream>
- </div>
-
-<div class="d-flex justify-content-center social_icon" *ngIf="isCamIconHidden" >
-  <span><fa-icon [icon]="faCamera" (click)="changeCamActive()"></fa-icon></span>
-</div>

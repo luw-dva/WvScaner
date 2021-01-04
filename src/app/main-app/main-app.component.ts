@@ -15,7 +15,7 @@ export class MainAppComponent implements OnInit {
   constructor(
     private serviceService: ServiceService,
     private dataService: DataService
-  ) {}
+  ){}
 
 //--------DEKLARACJA ZMIENNYCH------
   //Icons
@@ -24,6 +24,8 @@ export class MainAppComponent implements OnInit {
   //Emitery// Bindowanie danych logowania
   @Output()
   isLogin = new EventEmitter<number>();
+  @Output()
+  isLoader = new EventEmitter<boolean>();
 
   //Deklaracja zmiennych
   private sub: any;
@@ -32,7 +34,8 @@ export class MainAppComponent implements OnInit {
   entities: string;
   entId: string;
   scanner: string;
-  entitiesParent: string;
+  loader: boolean = false;
+  entitiesParent: string = 'none';
   soapOpeartion: string;
   scannedQty: string = '0';
   scannedPT: string = '0';
@@ -42,6 +45,7 @@ export class MainAppComponent implements OnInit {
   isItemActive: boolean = false;
   isLocksActive: boolean = false;
   isSpecialItem: boolean = false;
+  isSpecialItemConfirm: boolean = false;
   isBlocks: boolean = false;
   userPcs: string = '0';
   userProcess: string = '0';
@@ -50,6 +54,13 @@ export class MainAppComponent implements OnInit {
   alertType = 0; // 0-brak, 1-pozytywny, 2-negatywny
   alertMessage: string = '';
   wynik: any; // Odpowiedź webservice'u
+  rgb: string = 'x';
+  rgb2: string = 'x';
+  rgbBG: string;
+  rgbBG2: string;
+  itemsResult: Array<{ item: string; message: string; rgb: string}> = [];
+  blockResult: Array<{ item: string; message: string; pos: string; qConfirm}> = [];
+  parser = new DOMParser();
 
   txtWorker: string;
   txtPosition: string;
@@ -62,9 +73,6 @@ export class MainAppComponent implements OnInit {
   txtNoSpecItem: string;
   txtWorkcenter: string;
   txtLocation: string;
-  itemsResult: Array<{ item: string; message: string; rgb: string}> = [];
-  blockResult: Array<{ item: string; message: string; pos: string; qConfirm}> = [];
-  parser = new DOMParser();
 
 //------TŁUMACZENIA-------
   dictionaryChangeLanguage() {
@@ -94,36 +102,48 @@ export class MainAppComponent implements OnInit {
     )
   }
 
+//Uruchomienie tłumaczeń
+  dictionaryInit(){
+       this.language = this.dataService.getLanguageFirstTime();
+       this.dictionaryChangeLanguage();
+       this.dataService.getLanguage().subscribe((data) => {
+         this.language = data;
+         this.dictionaryChangeLanguage();
+       });
+  }
+
   scannerChange(): void {
-    if (this.isItemActive) {
-      this.serviceMethod.getLocksSpecialItemsById(this.scanner, this.entId);
-      this.scanner = '';
-    }
+    if(!this.loader){
+        this.loader = true;
+        this.isLoader.emit(this.loader);
+      if (this.isItemActive) {
+        this.serviceMethod.getLocksSpecialItemsById(this.scanner, this.entId);
+        this.scanner = '';
+      }
 
-    if (this.isLocksActive) {
-      this.dataService.setBlockJust2Check(true);
-      this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
-      this.scanner = '';
-    }
+      if (this.isLocksActive) {
+        this.dataService.setBlockJust2Check(true);
+        this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
+        this.scanner = '';
+      }
 
-    if (!this.isItemActive && !this.isLocksActive){
-      this.dataService.setWo(this.scanner);
-      this.dataService.setBlockJust2Check(false);
-      this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
+      if (this.entitiesParent == 'T4000140' && !this.isItemActive && !this.isLocksActive ){
+        this.isSpecialItemConfirm = true;
+        this.serviceMethod.getLocksSpecialItemsById(this.scanner, this.entId);
+      }else if (!this.isItemActive && !this.isLocksActive){
+        this.dataService.setWo(this.scanner);
+        this.dataService.setBlockJust2Check(false);
+        this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
+        this.scanner = '';
+      }
     }
   }
 
 //------ngOnINIT----
   ngOnInit(): void {
     this.focusOnScanner();
-
-    //Uruchomienie tłumaczeń
-    this.language = this.dataService.getLanguageFirstTime();
-    this.dictionaryChangeLanguage();
-    this.dataService.getLanguage().subscribe((data) => {
-      this.language = data;
-      this.dictionaryChangeLanguage();
-    });
+    this.dictionaryInit();
+    this.isSpecialItemConfirm = false;
 
     this.userName = this.dataService.getUserName();
     this.entities = this.dataService.getEntName();
@@ -137,7 +157,7 @@ export class MainAppComponent implements OnInit {
       this.soapOpeartion = this.serviceService.getSoapOperation();
 
       if (this.soapOpeartion == 'ConfirmBackground') {
-        if (data !=false){
+        if (data != false){
         this.userPcs =this.wynik.getElementsByTagName('Worker_pcs')[0].childNodes[0].nodeValue
         this.dataService.setUserPcs(this.userPcs);
         this.userProcess =this.wynik.getElementsByTagName('Worker_process')[0].childNodes[0].nodeValue
@@ -146,35 +166,64 @@ export class MainAppComponent implements OnInit {
         this.scannedQty = this.dataService.getUserPcs();
       }
       this.soapOpeartion = '';
+      this.isSpecialItemConfirm = false;
+      this.scanner = '';
     }
 
       if (this.soapOpeartion == 'GetLocksSpecialItemsById') {
         try{
         if (this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length) {
-          for (
-            let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
+          this.rgb = '';
+          this.rgb2 = '';
+          for (let i = 0; i < this.wynik.getElementsByTagName('BOM_items')[0].childNodes.length; i++) {
               let rgb_ds = 'x';
               try {
                 rgb_ds = this.wynik.getElementsByTagName('item')[i].getElementsByTagName('rgb')[0].childNodes[0].nodeValue;
-              } catch (error) {}
+                if( this.rgb == ''){
+                  this.rgb = rgb_ds;
+                }else{
+                  this.rgb2 = rgb_ds;
+                }
+              } catch(error){};
 
             this.itemsResult[i] = {item: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('item_name')[0].childNodes[0].nodeValue,
               message: this.wynik.getElementsByTagName('item')[i].getElementsByTagName('message')[0].childNodes[0].nodeValue,
               rgb: rgb_ds
             };
           }
-          this.isSpecialItem = true;
+            this.isSpecialItem = true;
+            this.rgbBG = '';
+            this.rgbBG2 = '';
+
+          if (this.entitiesParent == 'T4000140'){
+            if (this.rgb != '' && this.rgb2 == ''){
+              this.rgb2 = this.rgb
+            }
+            this.rgbBG = this.rgb;
+            this.rgbBG2 = this.rgb2;
+          }
         }
-        this.soapOpeartion = ''
+        this.soapOpeartion = '';
       }catch(err){
-          if(this.isItemActive){
+        if(this.isItemActive){
           this.alertType = 1;
           this.alertMessage = this.txtNoSpecItem;
           setTimeout(() => {
             this.alertType = 0;
           }, 2000);
         }
-      }}
+
+        if (this.entitiesParent == 'T4000140' && this.isSpecialItemConfirm){
+          this.dataService.setWo(this.scanner);
+          this.dataService.setBlockJust2Check(false);
+          this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
+          this.isSpecialItemConfirm = false;
+          this.scanner = '';
+        }
+
+        this.soapOpeartion = '';
+      }
+    }
 
      if(this.soapOpeartion == 'GetUserResult'){
         if (this.wynik != 'false') {
@@ -222,25 +271,23 @@ export class MainAppComponent implements OnInit {
           this.isBlocks = true;
           this.dataService.setBlocks(this.blockResult);
         }
-
         this.isLogin.emit(3);
         this.soapOpeartion = '';
-
       }else{
-
         if(this.isLocksActive){
-        this.alertType = 1;
-        this.alertMessage = this.txtNoBlocks;
-        setTimeout(() => {
-          this.alertType = 0;
-        }, 2000);
+          this.alertType = 1;
+          this.alertMessage = this.txtNoBlocks;
+          setTimeout(() => {
+            this.alertType = 0;
+          }, 2000);
         }else{
-          this.serviceMethod.confirmBackground(this.dataService.getWo(), this.entId, this.userName)
+          this.serviceMethod.confirmBackground(this.dataService.getWo(), this.entId, this.userName);
         }
       }
-      this.scanner = '';
-      this.soapOpeartion = ''
+      this.soapOpeartion = '';
     }
+    this.loader = false;
+    this.isLoader.emit(this.loader);
     });
   }
 
@@ -281,6 +328,12 @@ export class MainAppComponent implements OnInit {
   closeSpecialItemWindow(res: boolean) {
     this.isSpecialItem = !res;
     this.itemsResult.length = 0;
+  }
+
+  closeSpecialItemWindow2(res: boolean) {
+    this.dataService.setWo(this.scanner);
+    this.dataService.setBlockJust2Check(false);
+    this.serviceMethod.GetActiveLocksByIdOperation(this.scanner, this.entitiesParent);
   }
 
   ngOnDestroy() {

@@ -35,15 +35,6 @@
     </div>
   </div>
   <div class="camera">
-    <!-- <app-demo (barCodeResult)='barcodeEvent($event)' style="z-index: -1;"></app-demo> -->
   </div>
-  <!-- <div id="intro" class='d-flex justify-content-end social_icon'>
-    <div id="down_arrow">
-      <span><i class="fas fa-camera"></i></span>
-    </div>
-  </div>
-style='opacity: 0; height:1px; width: 1px;'
--->
-
 </div>
 <input #scanInput type='text' autofocus  style='opacity: 0; z-index:-10' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">

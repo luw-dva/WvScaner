@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   languageName: string = '[PL]';
   viewNumber: number;
   scanner:string ;
+  loader: boolean = false;
 
   scannerChange(){
 
@@ -47,5 +48,9 @@ export class AppComponent implements OnInit {
 
   isLogin(status: number): void {
     this.viewNumber = status;
+  }
+
+  isLoader(status: boolean): void {
+    this.loader = status;
   }
 }

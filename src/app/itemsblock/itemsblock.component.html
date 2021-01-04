@@ -1,13 +1,16 @@
 <div class='itemlist'>
   <div>
     <button class='btn btn-warning' (click)="close()">close</button>
+    <button class='btn btn-warning' *ngIf="isToConfirm" (click)="confirm()">confirm</button>
   </div>
-
+<br>
   <div *ngFor="let item of childBLock" >
       <p>{{item.item}} | {{item.message}}</p>
       <div *ngIf="item.rgb != 'x'">
         <div [ngStyle]="{'background-color': item.rgb}" class="divRGB"></div>
       </div>
+
   </div>
+<br>
 </div>
 

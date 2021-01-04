@@ -10,13 +10,14 @@
       <div class="card-body">
         <div class='blocklist'>
             <div>
-              <p><span><h4>{{childBLock[childBLockElement].message}}</h4></span><br>
-                <span>Pos: {{childBLock[childBLockElement].pos}}</span><br>
-                <span><b>{{childBLock[childBLockElement].item}}</b></span></p>
+              <p><span><h4>{{childBLock[childBLockElement-1].message}}</h4></span><br>
+                <span>Pos: {{childBLock[childBLockElement-1].pos}}</span><br>
+                <span><b>{{childBLock[childBLockElement-1].item}}</b></span></p>
             </div>
 
             <div id="outer">
               <div class="inner"><button type="submit" name="left" [ngClass]="leftClass" (click)="goLeft()" ><fa-icon [icon]="faArrowAltCircleLeft"></fa-icon></button></div>
+              {{childBLockElement}} / {{childBLock.length}}
               <div class="inner"><button type="submit" name="right" [ngClass]="rightClass" (click)="goRight()"><fa-icon [icon]="faArrowAltCircleRight"></fa-icon></button></div>
             </div>
         </div>
@@ -36,21 +37,24 @@
         </div>
       </div>
       </div>
-      <button style="margin:2px; z-index: 99;" [ngClass]="btnClass" (click)="DeactivateWoLocks()" [hidden]="isBlock2Check">{{confirmButton}}</button>
-      <button style="margin:2px; z-index: 99;" class='btn btn-warning' (click)="goToMainView()">{{backButton}}</button>
+      <button style="margin:2px; z-index: 79;" [ngClass]="btnClass" (click)="DeactivateWoLocks()" [hidden]="isBlock2Check">{{confirmButton}}</button>
+      <button style="margin:2px; z-index: 79;" class='btn btn-warning' (click)="goToMainView()">{{backButton}}</button>
    </div>
   </div>
 </div>
-<div [ngSwitch]="alertType">
-  <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
-   {{alertMessage}}
- </div>
- <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
-   {{alertMessage}}
- </div>
- <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 10px;">
-  {{alertMessage}}
-</div>
+<div [ngSwitch]="alertType" style='position: absolute; margin-top: 10px;  left: 10px;
+right: 10px;
+margin-left: auto;
+margin-right: auto;  z-index: 999; font-size: 18px;'>
+    <div *ngSwitchCase=1 class="alert alert-success" role="alert" style="margin: 10px;">
+    {{alertMessage}}
+  </div>
+  <div *ngSwitchCase=2 class="alert alert-danger" role="alert" style="margin: 10px;">
+    {{alertMessage}}
+  </div>
+  <div *ngSwitchCase=3 class="alert alert-info" role="alert" style="margin: 10px;">
+    {{alertMessage}}
+  </div>
 </div>
 
 <input #scanInput type='text' autofocus  style='opacity: 0; height: 1px;' [(ngModel)]="scanner" (change)="scannerChange()" (blur)="focusOnScanner()">

@@ -2,19 +2,19 @@
   <span class="language_icon" (click)="changeLanguage()">{{languageName}}</span>
 </div>
 
+<app-loader *ngIf="loader" ></app-loader>
+
+
 <div  style="position: relative;">
   <div *ngIf="viewNumber == 1">
-    <app-login-app (isLogin)='isLogin($event)' ></app-login-app>
+    <app-login-app (isLogin)='isLogin($event)' (isLoader)='isLoader($event)'></app-login-app>
   </div>
 
   <div *ngIf="viewNumber == 2">
-    <app-main-app (isLogin)='isLogin($event)'></app-main-app>
+    <app-main-app (isLogin)='isLogin($event)' (isLoader)='isLoader($event)'></app-main-app>
   </div>
 
   <div *ngIf="viewNumber == 3">
-    <app-blocks (isLogin)='isLogin($event)'></app-blocks>
+    <app-blocks (isLogin)='isLogin($event)' (isLoader)='isLoader($event)'></app-blocks>
   </div>
 </div>
-
-
-

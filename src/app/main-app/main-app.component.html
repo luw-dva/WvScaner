@@ -9,6 +9,10 @@
       </div>
       <div class="card-body">
         <div>
+          <div class='rgb_div' *ngIf="entitiesParent =='T4000140'" >
+            <div  class='rgb_div1_2' [ngStyle]="{'background-color': rgbBG}"></div>
+            <div  class='rgb_div1_2' [ngStyle]="{'background-color': rgbBG2}"></div>
+          </div>
           <p>
           <span><label>Pos: </label> {{entities}}</span>
           <span><label>{{txtWorkcenter}}: </label> {{entitiesParent}}</span>
@@ -48,10 +52,11 @@
           </div>
         </div>
       </div>
-        <button style="margin:2px; z-index: 99;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
-        <button style="margin:2px; z-index: 99;" [ngClass]="locksButtonClass"  (click)="activeLocks()">{{txtBlocks}}</button>
-        <button [hidden]="!isStaticLocation" style="margin:2px; z-index: 99;" [ngClass]="staticLocationButtonClass">{{txtLocation}}</button>
+        <button style="margin:2px; z-index: 79;" [ngClass]="itemButtonClass"  (click)="activeItem()" >{{txtItems}}</button>
+        <button style="margin:2px; z-index: 79;" [ngClass]="locksButtonClass"  (click)="activeLocks()">{{txtBlocks}}</button>
+        <button [hidden]="!isStaticLocation" style="margin:2px; z-index: 79;" [ngClass]="staticLocationButtonClass">{{txtLocation}}</button>
       </div>
-    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" style='position: absolute; margin-top: 10px;' [childBLock]="itemsResult"></app-itemsblock>
+    <app-itemsblock [hidden]="!isSpecialItem" (closeEmiter)="closeSpecialItemWindow($event)" (confirmEmiter)="closeSpecialItemWindow2($event)" style='position: absolute; margin-top: 10px; z-index: 999;' [childBLock]="itemsResult" [isToConfirm]="isSpecialItemConfirm"></app-itemsblock>
   </div>
 </div>
+
